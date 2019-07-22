@@ -10,6 +10,7 @@ import android.content.pm.PackageManager;
 import android.location.Location;
 import android.location.LocationListener;
 import android.location.LocationManager;
+import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.CountDownTimer;
@@ -58,6 +59,8 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
     private TextView mTvHoten;
 
+    private Location mMyLocation;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -69,13 +72,12 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setActionBar(toolbar);
 
-
-        // Sử dụng sactionbar
+        toolbar.collapseActionView();
+        // Sử dụng Actionbar
         ActionBar actionBar = getActionBar();
-        actionBar.setTitle("Xin chào Minh Tâm Bùi !");
-        actionBar.setLogo(R.mipmap.ic_launcher);
-        actionBar.setDisplayShowHomeEnabled(true);
-        actionBar.setDisplayUseLogoEnabled(true);
+        actionBar.setTitle(" Xin chào Bùi Minh Tâm");
+        actionBar.setLogo(R.mipmap.ic_logo);
+        ((TextView) toolbar.getChildAt(0)).setTextSize(15);
 
 
         // Obtain the SupportMapFragment and get notified when the map is ready to be used.
@@ -127,7 +129,6 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     }
 
 
-
     @Override
     public void onMapReady(GoogleMap googleMap) {
         mMap = googleMap;
@@ -160,25 +161,20 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         //--- Hien vi tri cua minh----
         //      Cap quyen truy cap GPS
         if (ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED ||
+                ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
 
-                ContextCompat.checkSelfPermission(this, Manifest.permission.BLUETOOTH) != PackageManager.PERMISSION_GRANTED ||
-
-                ContextCompat.checkSelfPermission(this, Manifest.permission.BLUETOOTH_ADMIN) != PackageManager.PERMISSION_GRANTED) {
+            System.out.println("Vui lòng cho phép quyền truy cập vị trí");
 
             ActivityCompat.requestPermissions(this,
 
                     new String[]{Manifest.permission.ACCESS_FINE_LOCATION,
 
-                            Manifest.permission.ACCESS_COARSE_LOCATION,
-
-                            Manifest.permission.BLUETOOTH,
-
-                            Manifest.permission.BLUETOOTH_ADMIN}, REQUEST_LOCATION);
+                            Manifest.permission.ACCESS_COARSE_LOCATION}, REQUEST_LOCATION);
 
         } else {
-            System.out.println("Location permissions available, starting location");
+            System.out.println("Đang định vị");
             locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER,
-                    5000,   // 5 sec
+                    3000,   // 5 sec
                     10, this);
             mMap.setMyLocationEnabled(true);
         }
@@ -187,6 +183,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 //        mMap.setMyLocationEnabled(true);
 
         //Set event Maps
+        mMap.setMyLocationEnabled(true);
         mMap.setOnMyLocationButtonClickListener(this);
         mMap.setOnMyLocationClickListener(this);
         mMap.setOnInfoWindowClickListener(this);
@@ -219,8 +216,8 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
     }
 
-    private void viewDialogMuonXe() {
-
+    private void viewDialogMuonXe(final double lat, final double longt) {
+        final String toaDo = lat + "," + longt;
         AlertDialog.Builder builder = new AlertDialog.Builder(this);
         builder.setTitle("Mượn xe");
         LayoutInflater inflater = getLayoutInflater();
@@ -231,21 +228,40 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
             @Override
             public void onClick(View v) {
                 // Gửi socket.IO
-                senDataSocket(0,textViewSTTXe.getText().toString());
+                senDataSocket(0, textViewSTTXe.getText().toString(), toaDo);
 
+            }
+        });
+
+        Button chiDuong = dialogLayout.findViewById(R.id.btn_chi_duong);
+        chiDuong.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+
+                Intent intent = new Intent(android.content.Intent.ACTION_VIEW,
+                        Uri.parse("google.navigation:q=" + toaDo));
+                startActivity(intent);
             }
         });
 
         builder.setView(dialogLayout);
-        builder.setPositiveButton("Hủy", new DialogInterface.OnClickListener() {
+
+        Button btnHuy = dialogLayout.findViewById(R.id.btn_huy);
+        btnHuy.setOnClickListener(new View.OnClickListener() {
             @Override
-            public void onClick(final DialogInterface dialogInterface, int i) {
+            public void onClick(View v) {
                 if (mAlertDialog.isShowing()) {
                     mAlertDialog.dismiss();
                 }
-
             }
         });
+//        builder.setPositiveButton("Hủy", new DialogInterface.OnClickListener() {
+//            @Override
+//            public void onClick(final DialogInterface dialogInterface, int i) {
+//
+//
+//            }
+//        });
         mAlertDialog = builder.create();
         mAlertDialog.setCancelable(false);
         mAlertDialog.show();
@@ -261,23 +277,15 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
     }
 
-    private boolean senDataSocket(final int n, final String sttXe) {
+    private boolean senDataSocket(final int n, final String sttXe, final String toado) {
+
+        //...............Test View ................
+        Intent test = new Intent(this, DangMuonXeActivity.class);
+        test.putExtra("STTXE", sttXe);
+        test.putExtra("TOA_DO", toado);
+        startActivity(test); //Chuyển sang trạng thái dang mượn xe
+
         if (ConnectSocketIO.getInstance(MapsActivity.this).sendData("Client-send-unlock", "unlock", true)) { //Succes is true
-//            new CountDownTimer(5000, 1000) {
-//                String textShowCalling = "Đang gọi";
-//
-//                public void onTick(long millisUntilFinished) {
-//                    textShowCalling += ".";
-//                    mTvCall.setText(textShowCalling);
-//                }
-//
-//                public void onFinish() {
-//                    mTvCall.setText("");
-//                    mReViewCall.setVisibility(View.GONE);
-//                    mFAB.setEnabled(true);
-//                    viewSucc(mReViewCall, "Đã gọi thanh toán! Xin quí khách chờ trong vài giây");
-//                }
-//            }.start();
 
             //------Gửi thành công---------
             Toast.makeText(this, "Đã gửi yêu cầu mở khóa xe", Toast.LENGTH_SHORT).show();
@@ -295,7 +303,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                     }
 
                     public void onFinish() {
-                        senDataSocket(n + 1,sttXe); //Đệ quy, tiếp tục gọi lại;
+                        senDataSocket(n + 1, sttXe, toado); //Đệ quy, tiếp tục gọi lại;
                     }
                 }.start();
                 Toast.makeText(MapsActivity.this, "Đang gọi lại lần " + n, Toast.LENGTH_SHORT).show();
@@ -317,10 +325,42 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
     @Override
     public boolean onMyLocationButtonClick() {
-        Toast.makeText(this, "MyLocation button clicked", Toast.LENGTH_SHORT).show();
-        // Return false so that we don't consume the event and the default behavior still occurs
-        // (the camera animates to the user's current position).
-        return false;
+        final LocationManager manager = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
+
+        if (!manager.isProviderEnabled(LocationManager.GPS_PROVIDER)) {
+            viewAlertMessageNoGps();
+        }
+
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+            if (checkSelfPermission(Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && checkSelfPermission(Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+                Toast.makeText(this, "Chưa cấp quyền vị trí", Toast.LENGTH_SHORT).show();
+                ActivityCompat.requestPermissions(this,
+
+                        new String[]{Manifest.permission.ACCESS_FINE_LOCATION,
+
+                                Manifest.permission.ACCESS_COARSE_LOCATION,
+
+                                Manifest.permission.BLUETOOTH,
+
+                                Manifest.permission.BLUETOOTH_ADMIN}, REQUEST_LOCATION);
+            }
+        }
+        locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER,
+                3000,   // 3 sec
+                10, this);
+
+        mMyLocation = locationManager.getLastKnownLocation(LocationManager.NETWORK_PROVIDER);
+        if (mMyLocation != null) {
+            CameraPosition cameraPosition = CameraPosition.builder()
+                    .target(new LatLng(mMyLocation.getLatitude(), mMyLocation.getLongitude()))
+                    .build();
+            CameraUpdate cameraUpdate = CameraUpdateFactory.newCameraPosition(cameraPosition);
+            mMap.animateCamera(cameraUpdate, 2000, null);
+        }
+
+        Toast.makeText(this, "Đang định vị tọa dộ....", Toast.LENGTH_SHORT).show();
+
+        return true;
     }
 
     @Override
@@ -335,6 +375,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                                 3000,   // 3 sec
                                 10, this);
                         mMap.setMyLocationEnabled(true);
+                        Toast.makeText(this, "Đang truy cập vị trí", Toast.LENGTH_SHORT).show();
                     }
                 } else {
                     Toast.makeText(this, "Chưa cấp quyền truy cập vị trí", Toast.LENGTH_SHORT).show();
@@ -344,7 +385,8 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
     @Override
     public void onMyLocationClick(@NonNull Location location) {
-        Toast.makeText(this, "Current location:\n" + location, Toast.LENGTH_LONG).show();
+        Toast.makeText(this, "Vị trí hiện tại của tôi:\n" + location, Toast.LENGTH_LONG).show();
+//        mMyLocation =
     }
 
     //----------Sự kiện GPS---------------------
@@ -352,6 +394,12 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     public void onLocationChanged(Location location) {
         String str = "Latitude: " + location.getLatitude() + "Longitude: " + location.getLongitude();
         Log.e(TAG, "onLocationChanged: " + str);
+        mMyLocation = location;
+        CameraPosition cameraPosition = CameraPosition.builder()
+                .target(new LatLng(location.getLatitude(), location.getLongitude()))
+                .build();
+        CameraUpdate cameraUpdate = CameraUpdateFactory.newCameraPosition(cameraPosition);
+        mMap.animateCamera(cameraUpdate, 2000, null);
     }
 
     @Override
@@ -361,29 +409,59 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
     @Override
     public void onProviderEnabled(String provider) {
-
+        Toast.makeText(getBaseContext(), "Đã bật GPS !", Toast.LENGTH_LONG).show();
     }
 
     @Override
     public void onProviderDisabled(String provider) {
-
+        Intent gpsOptionsIntent = new Intent(
+                android.provider.Settings.ACTION_LOCATION_SOURCE_SETTINGS);
+        startActivity(gpsOptionsIntent);
     }
 
 
     //Click vô vị trí xe
     @Override
-    public void onInfoWindowClick(Marker marker) {
-        Toast.makeText(this, "marker Click............", Toast.LENGTH_SHORT).show();
+    public void onInfoWindowClick(final Marker marker) {
+        final LatLng latLng = marker.getPosition();
         //Di chuyen camera den marker
         CameraPosition cameraPosition = CameraPosition.builder()
                 .target(marker.getPosition())
-                .tilt(45)//goc nhin
-                .zoom(17)// ti le zoom
+                .zoom(18)// ti le zoom
                 .build();
-        CameraUpdate cameraUpdate = CameraUpdateFactory.newCameraPosition(cameraPosition);
-        mMap.animateCamera(cameraUpdate, 1000, null);
-        viewDialogMuonXe();
 
+        CameraUpdate cameraUpdate = CameraUpdateFactory.newCameraPosition(cameraPosition);
+        mMap.animateCamera(cameraUpdate, 2000, new GoogleMap.CancelableCallback() {
+            @Override
+            public void onFinish() {
+                viewDialogMuonXe(latLng.latitude, latLng.longitude);
+            }
+
+            @Override
+            public void onCancel() {
+
+            }
+        });
+
+
+    }
+
+    private void viewAlertMessageNoGps() {
+        final AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        builder.setMessage("Your GPS seems to be disabled, do you want to enable it?")
+                .setCancelable(false)
+                .setPositiveButton("Yes", new DialogInterface.OnClickListener() {
+                    public void onClick(@SuppressWarnings("unused") final DialogInterface dialog, @SuppressWarnings("unused") final int id) {
+                        startActivity(new Intent(android.provider.Settings.ACTION_LOCATION_SOURCE_SETTINGS));
+                    }
+                })
+                .setNegativeButton("No", new DialogInterface.OnClickListener() {
+                    public void onClick(final DialogInterface dialog, @SuppressWarnings("unused") final int id) {
+                        dialog.cancel();
+                    }
+                });
+        final AlertDialog alert = builder.create();
+        alert.show();
     }
 }
 

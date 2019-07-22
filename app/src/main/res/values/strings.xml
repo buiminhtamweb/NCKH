@@ -15,6 +15,8 @@
         completions."
     </string>
 
+    <string name="google_maps_key" templateMergeStrategy="preserve" translatable="false">AIzaSyD8szpJr5MeGTqMxpTF0OWd_sGU8Lb9rkc</string>
+
 
     <string name="sharedPreferences">com.ctu.nckh</string>
 

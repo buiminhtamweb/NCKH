@@ -26,6 +26,7 @@ public class DangMuonXeActivity extends AppCompatActivity {
     private TextView mTvXeMuon;
     private AlertDialog mAlertDialog;
     private List<String> mDSLoi = new ArrayList<>();
+    private String mToaDo;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -36,6 +37,7 @@ public class DangMuonXeActivity extends AppCompatActivity {
         Intent intent = getIntent();
         if (null != intent) {
             mTvXeMuon.setText(intent.getStringExtra("STTXE"));
+            mToaDo = intent.getStringExtra("TOA_DO");
         }
 
         //Khoi tạo danh sach loi
@@ -46,7 +48,7 @@ public class DangMuonXeActivity extends AppCompatActivity {
 
 
     public void anUngDung(View view) {
-
+        minimizeApp();
     }
 
     public void baoHuHong(View view) {
@@ -57,8 +59,6 @@ public class DangMuonXeActivity extends AppCompatActivity {
     }
 
     private void viewDialogBaoHuHong() {
-
-
         AlertDialog.Builder builder = new AlertDialog.Builder(this);
         builder.setTitle("Báo hư hỏng");
         LayoutInflater inflater = getLayoutInflater();
@@ -120,10 +120,15 @@ public class DangMuonXeActivity extends AppCompatActivity {
     }
 
     public void chiDuongDenXe(View view) {
-
-        String toaDo = "10.0306221,105.7684058";
         Intent intent = new Intent(android.content.Intent.ACTION_VIEW,
-                Uri.parse("google.navigation:q=" + toaDo));
+                Uri.parse("google.navigation:q=" + mToaDo));
         startActivity(intent);
+    }
+
+    private void minimizeApp() {
+        Intent startMain = new Intent(Intent.ACTION_MAIN);
+        startMain.addCategory(Intent.CATEGORY_HOME);
+        startMain.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+        startActivity(startMain);
     }
 }

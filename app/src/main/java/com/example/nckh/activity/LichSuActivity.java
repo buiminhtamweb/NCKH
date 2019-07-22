@@ -52,7 +52,6 @@ public class LichSuActivity extends AppCompatActivity implements ViewPager.OnPag
         mViewPager.setAdapter(mViewPagerAdapter);
         mViewPager.addOnPageChangeListener(this);
         mViewPager.setOffscreenPageLimit(1);
-
         mTabLayout.setupWithViewPager(mViewPager);
 
 

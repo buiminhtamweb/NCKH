@@ -4,7 +4,7 @@
     <item
         android:id="@+id/menu_lich_su"
         android:icon="@drawable/ic_history_black_24dp"
-        android:title="Lịch sử sử dụng"
+        android:title="Lịch sử"
         app:showAsAction="ifRoom" />
     <item
         android:id="@+id/menu_dang_xuat"

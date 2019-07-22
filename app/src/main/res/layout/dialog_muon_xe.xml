@@ -3,7 +3,8 @@
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:orientation="vertical"
-    android:padding="8dp">
+    android:padding="8dp"
+    android:background="@color/white_smoke">
 
     <LinearLayout
         android:layout_width="match_parent"
@@ -15,7 +16,7 @@
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Bạn dang chọn xe số"
+            android:text="Bạn đang chọn xe số"
             android:textSize="25sp" />
 
         <TextView
@@ -29,23 +30,41 @@
     </LinearLayout>
 
 
-    <Button
+    <LinearLayout
         android:layout_marginTop="8dp"
-        android:id="@+id/btn_muon_xe"
+        android:orientation="horizontal"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:text="Mượn xe"
-        android:textColor="@color/white"
-        android:background="@drawable/backround_button"/>
+        android:layout_height="wrap_content">
+
+        <Button
+            android:layout_margin="4dp"
+            android:layout_weight="1"
+            android:id="@+id/btn_muon_xe"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Mượn xe"
+            android:textColor="@color/white"
+            android:background="@drawable/backround_button" />
+
+        <Button
+            android:layout_margin="4dp"
+            android:layout_weight="1"
+            android:id="@+id/btn_chi_duong"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Chỉ đường đến đây"
+            android:textColor="@color/white"
+            android:background="@drawable/backround_button" />
+    </LinearLayout>
 
     <Button
-        android:layout_marginTop="4dp"
-        android:id="@+id/btn_huy_muon_xe"
+        android:layout_margin="4dp"
+        android:id="@+id/btn_huy"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="Chọn xe khác"
-        android:textColor="@color/white"
-        android:background="@drawable/backround_button" />
+        android:text="Hủy"
+        android:textColor="@color/design_default_color_primary_dark"
+        android:background="@drawable/backround_edittext" />
     <!--<RelativeLayout-->
     <!--android:layout_marginTop="8dp"-->
     <!--android:layout_marginEnd="8dp"-->

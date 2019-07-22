@@ -6,10 +6,11 @@
 
     <ImageView
         android:padding="12dp"
-        android:layout_width="36dp"
-        android:layout_height="36dp"
+        android:layout_width="48dp"
+        android:layout_height="48dp"
         android:layout_alignParentEnd="true"
-        android:layout_margin="16dp"
+        android:layout_marginTop="8dp"
+        android:layout_marginEnd="16dp"
         android:contentDescription="Lịch sử mượn xe"
         android:src="@drawable/ic_history_black_24dp" />
 
