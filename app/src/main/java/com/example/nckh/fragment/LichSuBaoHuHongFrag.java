@@ -7,21 +7,31 @@ import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.Button;
 import android.widget.TextView;
+
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
+
 import com.example.nckh.R;
+import com.example.nckh.adapter.RecyLSBaoHuHongAdapter;
+import com.example.nckh.object.HuHongObject;
 import com.google.android.material.snackbar.Snackbar;
+
+import java.util.ArrayList;
+import java.util.List;
+
 import static androidx.recyclerview.widget.RecyclerView.VERTICAL;
 
 public class LichSuBaoHuHongFrag extends Fragment {
     private RecyclerView mRecyclerView;
     private AlertDialog mAlertDialog;
     private ProgressDialog mProgressDialog;
+    private RecyLSBaoHuHongAdapter mRecyLSBaoHuHongAdapter;
+    private List<HuHongObject> mHuHongObjectList = new ArrayList<>();
+    private TextView mTvViewErr;
 
     @Nullable
     @Override
@@ -32,12 +42,23 @@ public class LichSuBaoHuHongFrag extends Fragment {
 
         RecyclerView.LayoutManager layoutManager = new LinearLayoutManager(getContext(), VERTICAL, false);
         mRecyclerView.setLayoutManager(layoutManager);
-//        mRecyclerView.setAdapter();
+
+        mRecyLSBaoHuHongAdapter = new RecyLSBaoHuHongAdapter(mHuHongObjectList);
+        mRecyLSBaoHuHongAdapter.setOnScrollListener(new RecyLSBaoHuHongAdapter.onScrollListener() {
+            @Override
+            public void onScroll(int position) {
+
+            }
+        });
+
+        mRecyclerView.setAdapter(mRecyLSBaoHuHongAdapter);
+
+        mTvViewErr = (TextView) view.findViewById(R.id.tv_view_err);
 
         return view;
     }
 
-    public void layDuLieuGioHang() {
+    public void layDanhSachHuHong() {
 
 
     }
@@ -47,7 +68,7 @@ public class LichSuBaoHuHongFrag extends Fragment {
     @Override
     public void onStart() {
         super.onStart();
-        layDuLieuGioHang();
+        layDanhSachHuHong();
     }
 
 
@@ -95,7 +116,7 @@ public class LichSuBaoHuHongFrag extends Fragment {
                 @Override
                 public void onClick(View v) {
 //                    mGioHang.clear();
-                    layDuLieuGioHang();
+                    layDanhSachHuHong();
                 }
             });
 

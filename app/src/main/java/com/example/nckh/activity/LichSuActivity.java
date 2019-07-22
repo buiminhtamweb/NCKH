@@ -1,5 +1,6 @@
 package com.example.nckh.activity;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.view.View;
 
@@ -13,6 +14,9 @@ import com.example.nckh.fragment.LichSuMuonXeFrag;
 import com.example.nckh.fragment.LichSuViPhamFrag;
 import com.google.android.material.tabs.TabLayout;
 
+import static com.example.nckh.util.Constant.DANG_MUON_XE_ACTIVITY;
+import static com.example.nckh.util.Constant.MAPS_ACTIVITY;
+
 public class LichSuActivity extends AppCompatActivity implements ViewPager.OnPageChangeListener {
 
     private ViewPagerAdapter mViewPagerAdapter;
@@ -21,11 +25,22 @@ public class LichSuActivity extends AppCompatActivity implements ViewPager.OnPag
     private LichSuBaoHuHongFrag mLichSuBaoHuHongFrag;
     private LichSuViPhamFrag mLichSuViPhamFrag;
     private TabLayout mTabLayout;
+    private int mActivityIntent = 0;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_lich_su);
+
+        Intent intentRecive = getIntent();
+        if (intentRecive != null) {
+            if (intentRecive.getIntExtra("ACTIVITY", 0) == MAPS_ACTIVITY) {
+                mActivityIntent = MAPS_ACTIVITY;
+
+            } else if (intentRecive.getIntExtra("ACTIVITY", 0) == DANG_MUON_XE_ACTIVITY) {
+                mActivityIntent = DANG_MUON_XE_ACTIVITY;
+            } else finish();
+        }
 
         mLichSuMuonXeFrag = new LichSuMuonXeFrag();
         mLichSuBaoHuHongFrag = new LichSuBaoHuHongFrag();
@@ -56,5 +71,16 @@ public class LichSuActivity extends AppCompatActivity implements ViewPager.OnPag
     @Override
     public void onPageScrollStateChanged(int state) {
 
+    }
+
+
+    public void trơVeManHinhTruoc(View view) {
+        if (mActivityIntent == MAPS_ACTIVITY) {
+            this.startActivity(new Intent(this, MapsActivity.class));
+            finish();
+        } else if (mActivityIntent == DANG_MUON_XE_ACTIVITY) {
+            this.startActivity(new Intent(this, DangMuonXeActivity.class));
+            finish();
+        } else finish();
     }
 }

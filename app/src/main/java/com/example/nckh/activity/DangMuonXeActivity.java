@@ -3,42 +3,34 @@ package com.example.nckh.activity;
 import android.app.AlertDialog;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.net.Uri;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
-import android.widget.Button;
 import android.widget.EditText;
 import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.appcompat.widget.Toolbar;
 
 import com.example.nckh.R;
-import com.example.nckh.data.ConnectServer;
-import com.google.android.material.floatingactionbutton.FloatingActionButton;
-import com.google.android.material.snackbar.Snackbar;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 public class DangMuonXeActivity extends AppCompatActivity {
-
-    //    private Button mBtnTraXe, mBtnAnUngDung
     private TextView mTvXeMuon;
     private AlertDialog mAlertDialog;
     private List<String> mDSLoi = new ArrayList<>();
-
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_dang_muon_xe);
-//        Toolbar toolbar = findViewById(R.id.toolbar);
-//        setSupportActionBar(toolbar);
 
         mTvXeMuon = (TextView) findViewById(R.id.tv_stt_xe_dang_muon);
         Intent intent = getIntent();
@@ -47,10 +39,7 @@ public class DangMuonXeActivity extends AppCompatActivity {
         }
 
         //Khoi tạo danh sach loi
-        mDSLoi.add("Chọn hư hỏng...");
-        mDSLoi.add("Không mở được ổ khóa");
-        mDSLoi.add("Không khóa được khóa xe");
-        mDSLoi.add("Khác");
+        mDSLoi.addAll(Arrays.asList(getResources().getStringArray(R.array.danh_sach_hu_hong)));
 
 
     }
@@ -130,4 +119,11 @@ public class DangMuonXeActivity extends AppCompatActivity {
         mAlertDialog.show();
     }
 
+    public void chiDuongDenXe(View view) {
+
+        String toaDo = "10.0306221,105.7684058";
+        Intent intent = new Intent(android.content.Intent.ACTION_VIEW,
+                Uri.parse("google.navigation:q=" + toaDo));
+        startActivity(intent);
+    }
 }

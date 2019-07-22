@@ -1,6 +1,7 @@
 package com.example.nckh.activity;
 
 import android.Manifest;
+import android.app.ActionBar;
 import android.app.AlertDialog;
 import android.content.Context;
 import android.content.DialogInterface;
@@ -11,16 +12,18 @@ import android.location.LocationListener;
 import android.location.LocationManager;
 import android.os.Build;
 import android.os.Bundle;
-
 import android.os.CountDownTimer;
 import android.util.Log;
 import android.view.LayoutInflater;
+import android.view.Menu;
+import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
+import android.widget.Toolbar;
 
 import androidx.annotation.NonNull;
 import androidx.core.app.ActivityCompat;
@@ -41,6 +44,8 @@ import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
 
+import static com.example.nckh.util.Constant.MAPS_ACTIVITY;
+
 public class MapsActivity extends FragmentActivity implements OnMapReadyCallback, LocationListener, GoogleMap.OnMyLocationButtonClickListener,
         GoogleMap.OnMyLocationClickListener, GoogleMap.OnInfoWindowClickListener {
 
@@ -58,6 +63,21 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_maps);
+
+
+        //Toolbar
+        Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
+        setActionBar(toolbar);
+
+
+        // Sử dụng sactionbar
+        ActionBar actionBar = getActionBar();
+        actionBar.setTitle("Xin chào Minh Tâm Bùi !");
+        actionBar.setLogo(R.mipmap.ic_launcher);
+        actionBar.setDisplayShowHomeEnabled(true);
+        actionBar.setDisplayUseLogoEnabled(true);
+
+
         // Obtain the SupportMapFragment and get notified when the map is ready to be used.
         SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager()
                 .findFragmentById(R.id.map);
@@ -69,18 +89,44 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         locationManager = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
         mapFragment.getMapAsync(this);
 
-        mTvHoten = (TextView) findViewById(R.id.tv_ho_ten);
-        if (SharedPreferencesHandler.getString(MapsActivity.this, Constant.SERVER_SOCKET_URL).equals("")) {
-            mTvHoten.setText("Chưa có địa chỉ");
-        } else
-            mTvHoten.setText(SharedPreferencesHandler.getString(MapsActivity.this, Constant.SERVER_SOCKET_URL));
-        mTvHoten.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                dialogDiaChiServer();
-            }
-        });
+//        mTvHoten = (TextView) findViewById(R.id.tv_ho_ten);
+//        if (SharedPreferencesHandler.getString(MapsActivity.this, Constant.SERVER_SOCKET_URL).equals("")) {
+//            mTvHoten.setText("Chưa có địa chỉ");
+//        } else
+//            mTvHoten.setText(SharedPreferencesHandler.getString(MapsActivity.this, Constant.SERVER_SOCKET_URL));
+//        mTvHoten.setOnClickListener(new View.OnClickListener() {
+//            @Override
+//            public void onClick(View v) {
+//                dialogDiaChiServer();
+//            }
+//        });
     }
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        getMenuInflater().inflate(R.menu.menu_maps, menu);
+        return super.onCreateOptionsMenu(menu);
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        switch (item.getItemId()) {
+            case R.id.menu_lich_su:
+                Intent intent = new Intent(this, LichSuActivity.class);
+                intent.putExtra("ACTIVITY", MAPS_ACTIVITY);
+                startActivity(intent);
+                break;
+            case R.id.menu_dang_xuat:
+                dangXuat();
+                break;
+            default:
+                break;
+        }
+
+        return super.onOptionsItemSelected(item);
+    }
+
+
 
     @Override
     public void onMapReady(GoogleMap googleMap) {
@@ -265,6 +311,9 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         }
     }
 
+    private void dangXuat() {
+    }
+
 
     @Override
     public boolean onMyLocationButtonClick() {
@@ -335,10 +384,6 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         mMap.animateCamera(cameraUpdate, 1000, null);
         viewDialogMuonXe();
 
-    }
-
-    public void viewLichSuMuonXe(View view) {
-        startActivity(new Intent(this, LichSuActivity.class));
     }
 }
 

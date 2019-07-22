@@ -23,7 +23,7 @@ public class ViewPagerAdapter extends FragmentPagerAdapter {
         this.mLichSuViPhamFrag = mLichSuViPhamFrag;
 
 
-        mTitle = new String[]{"Trang chủ", "Đặt hàng", "Tài khoản"};
+        mTitle = new String[]{"Mượn xe", "Báo hỏng", "Vi Phạm"};
     }
 
     @Override

@@ -22,4 +22,12 @@
     <string name="drawer_close">Close</string>
     <string name="err_connect_to_server">Lỗi kết nối đến máy chủ!</string>
     <string name="title_activity_main">MainActivity</string>
+
+    <string-array name="danh_sach_hu_hong">
+        <item>Chọn hư hỏng...</item>
+        <item>Không mở được ổ khóa</item>
+        <item>Không khóa được khóa xe</item>
+        <item>Khác</item>
+    </string-array>
+
 </resources>

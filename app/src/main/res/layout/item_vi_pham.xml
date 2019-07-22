@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:padding="8dp">
+
+    <TextView
+        android:id="@+id/tv_item_stt_xe"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Số thứ tự xe"
+        android:textSize="18sp"
+        android:textStyle="bold" />
+
+    <TextView
+        android:id="@+id/tv_item_thoi_gian_vi_pham"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Vi phạm vào lúc: 19/7/2019" />
+
+    <TextView
+        android:id="@+id/tv_item_vi_tri_vi_pham"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Tại vị trí: 11.1000000;105.02392343" />
+
+    <TextView
+        android:id="@+id/tv_item_loi_vi_pham"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Vượt ra khỏi khuôn viên trường đại học" />
+
+    <TextView
+        android:id="@+id/tv_item_hinh_thuc_xu_ly"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Chưa xử phạt hành chính" />
+</LinearLayout>

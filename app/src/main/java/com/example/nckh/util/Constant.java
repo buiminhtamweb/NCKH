@@ -12,4 +12,8 @@ public class Constant {
     public static final String SOCKET_MUON_XE = "notification-table-";
 
     public static final String SERVER_SOCKET_URL = "SERVER_SOCKET_URL";
+    public static final int MAPS_ACTIVITY = 1;
+    public static final int DANG_MUON_XE_ACTIVITY = 2;
+
+
 }

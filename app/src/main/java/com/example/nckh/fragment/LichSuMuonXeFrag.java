@@ -1,34 +1,54 @@
 package com.example.nckh.fragment;
+
 import android.app.AlertDialog;
 import android.app.ProgressDialog;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.TextView;
+
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
+
 import com.example.nckh.R;
+import com.example.nckh.adapter.RecyLSMuonXeAdapter;
+import com.example.nckh.object.MuonXeObject;
 import com.google.android.material.snackbar.Snackbar;
+
+import java.util.ArrayList;
+import java.util.List;
 
 public class LichSuMuonXeFrag extends Fragment {
 
     private static final String TABLE_CALL = "call-table-";
     private static final String TAG = "LichSuMuonXeFrag";
-    private RecyclerView mRecyLichSuMuonXe;
+
     private ProgressDialog mProgress;
     private AlertDialog mAlertDialog;
+    private RecyclerView mRecyLichSuMuonXe;
 
+    private RecyLSMuonXeAdapter mMuonXeAdapter;
+    private List<MuonXeObject> mMuonXeObjectList = new ArrayList<>();
+    private TextView mTvViewErr;
 
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
-        View view = inflater.inflate(R.layout.frag_lich_su_bao_hu_hong, container, false);
+        View view = inflater.inflate(R.layout.frag_lich_su_muon_xe, container, false);
         mRecyLichSuMuonXe = (RecyclerView) view.findViewById(R.id.recy_lich_su_muon_xe);
         RecyclerView.LayoutManager layoutManager = new LinearLayoutManager(getContext(), RecyclerView.VERTICAL, false);
         mRecyLichSuMuonXe.setLayoutManager(layoutManager);
+
+        mMuonXeAdapter = new RecyLSMuonXeAdapter(mMuonXeObjectList);
+        mRecyLichSuMuonXe.setAdapter(mMuonXeAdapter);
+
+        mTvViewErr = (TextView) view.findViewById(R.id.tv_view_err);
+
+
         getDataFromServer();
         return view;
     }
