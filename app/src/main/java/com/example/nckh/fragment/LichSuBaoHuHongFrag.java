@@ -17,13 +17,22 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.nckh.R;
 import com.example.nckh.adapter.RecyLSBaoHuHongAdapter;
+import com.example.nckh.data.ConnectServer;
 import com.example.nckh.object.HuHongObject;
+import com.example.nckh.object.LSBaoHuHong.LSBaoHuHong;
+import com.example.nckh.util.SharedPreferencesHandler;
 import com.google.android.material.snackbar.Snackbar;
 
 import java.util.ArrayList;
 import java.util.List;
 
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Response;
+
 import static androidx.recyclerview.widget.RecyclerView.VERTICAL;
+import static com.example.nckh.util.Constant.TK_ID;
+import static com.example.nckh.util.Constant.TOKEN;
 
 public class LichSuBaoHuHongFrag extends Fragment {
     private RecyclerView mRecyclerView;
@@ -32,6 +41,8 @@ public class LichSuBaoHuHongFrag extends Fragment {
     private RecyLSBaoHuHongAdapter mRecyLSBaoHuHongAdapter;
     private List<HuHongObject> mHuHongObjectList = new ArrayList<>();
     private TextView mTvViewErr;
+    private String mToken;
+    private String mTK_ID;
 
     @Nullable
     @Override
@@ -54,12 +65,24 @@ public class LichSuBaoHuHongFrag extends Fragment {
         mRecyclerView.setAdapter(mRecyLSBaoHuHongAdapter);
 
         mTvViewErr = (TextView) view.findViewById(R.id.tv_view_err);
+        mToken = SharedPreferencesHandler.getString(getContext(), TOKEN);
+        mTK_ID = SharedPreferencesHandler.getString(getContext(), TK_ID);
 
         return view;
     }
 
     public void layDanhSachHuHong() {
+        ConnectServer.getInstance().getApi().layLSBaoHuHong(mToken, mTK_ID, 1).enqueue(new Callback<LSBaoHuHong>() {
+            @Override
+            public void onResponse(Call<LSBaoHuHong> call, Response<LSBaoHuHong> response) {
+//                response.body().getDocs()
+            }
 
+            @Override
+            public void onFailure(Call<LSBaoHuHong> call, Throwable t) {
+
+            }
+        });
 
     }
 

@@ -10,15 +10,17 @@ import android.util.Log;
 import android.view.View;
 import android.widget.CheckBox;
 import android.widget.EditText;
+
 import androidx.appcompat.app.AppCompatActivity;
+
 import com.example.nckh.R;
 import com.example.nckh.data.ConnectServer;
-import com.example.nckh.object.ResLogin;
+import com.example.nckh.object.Token;
 import com.example.nckh.util.Constant;
 import com.example.nckh.util.SharedPreferencesHandler;
 import com.google.android.material.snackbar.Snackbar;
-import java.io.IOException;
 
+import java.io.IOException;
 
 import retrofit2.Call;
 import retrofit2.Callback;
@@ -57,13 +59,12 @@ public class LoginActivity extends AppCompatActivity {
         startActivity(i);
         if (checkNullDangNhap()) {
 
-            Call<ResLogin> call = ConnectServer.getInstance().getApi().signInAcc(mToken,
-                    mEdtUserName.getText().toString(),
+            Call<Token> call = ConnectServer.getInstance().getApi().signInAcc(mEdtUserName.getText().toString(),
                     mEdtPassword.getText().toString());
 
-            call.enqueue(new Callback<ResLogin>() {
+            call.enqueue(new Callback<Token>() {
                 @Override
-                public void onResponse(Call<ResLogin> call, Response<ResLogin> response) {
+                public void onResponse(Call<Token> call, Response<Token> response) {
                     hideProgressDialog();
 
                     if (response.code() == 400) {
@@ -74,7 +75,7 @@ public class LoginActivity extends AppCompatActivity {
                         }
                     }
 
-                    if (response.code() == 200 && response.body().getSERVERRESPONSE() == 1) {
+                    if (response.code() == 200 && response.body().getToken() != null) {
 
                         if (mCBRememberMe.isChecked()) {
 
@@ -85,27 +86,22 @@ public class LoginActivity extends AppCompatActivity {
                         }
 
 
-                        Log.e("LOGIN", "onResponse: TOKEN: " + response.body().getTOKEN());
+                        Log.e("LOGIN", "onResponse: TOKEN: " + response.body().getToken());
 
 
                         viewSucc(mCBRememberMe, "Đã đăng nhập thành công");
                         SharedPreferencesHandler.writeString(mContext, Constant.TK_ID, mEdtUserName.getText().toString());
-                        SharedPreferencesHandler.writeString(mContext, Constant.TOKEN, "Bearer " + response.body().getTOKEN());
+                        SharedPreferencesHandler.writeString(mContext, Constant.TOKEN, "Bearer " + response.body().getToken());
                         Intent i = new Intent(mContext, MapsActivity.class);
                         startActivity(i);
                         finish();
-                    } else if (response.code() == 200 && response.body().getSERVERRESPONSE() == 0) {
-
-                        viewError(response.body().getSERVERMESSAGE());
-
-                        v.setEnabled(true);
                     }
 
 
                 }
 
                 @Override
-                public void onFailure(Call<ResLogin> call, Throwable t) {
+                public void onFailure(Call<Token> call, Throwable t) {
                     viewErrorExitApp();
                 }
             });
