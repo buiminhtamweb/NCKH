@@ -20,8 +20,6 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
-import android.widget.EditText;
-import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 import android.widget.Toolbar;
@@ -32,8 +30,12 @@ import androidx.core.content.ContextCompat;
 import androidx.fragment.app.FragmentActivity;
 
 import com.example.nckh.R;
+import com.example.nckh.data.ConnectServer;
 import com.example.nckh.data.ConnectSocketIO;
-import com.example.nckh.util.Constant;
+import com.example.nckh.object.Message;
+import com.example.nckh.object.ThongTinTaiKhoan;
+import com.example.nckh.object.XeDangRanh;
+import com.example.nckh.util.DialogSupport;
 import com.example.nckh.util.SharedPreferencesHandler;
 import com.google.android.gms.maps.CameraUpdate;
 import com.google.android.gms.maps.CameraUpdateFactory;
@@ -45,7 +47,17 @@ import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
 
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
+
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Response;
+
 import static com.example.nckh.util.Constant.MAPS_ACTIVITY;
+import static com.example.nckh.util.Constant.TK_ID;
+import static com.example.nckh.util.Constant.TOKEN;
 
 public class MapsActivity extends FragmentActivity implements OnMapReadyCallback, LocationListener, GoogleMap.OnMyLocationButtonClickListener,
         GoogleMap.OnMyLocationClickListener, GoogleMap.OnInfoWindowClickListener {
@@ -58,8 +70,12 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     private AlertDialog mAlertDialog;
 
     private TextView mTvHoten;
-
+    private ActionBar mActionBar;
     private Location mMyLocation;
+
+    private String mToken;
+    private String mTK_ID;
+    private DialogSupport mDialogSupport;
 
 
     @Override
@@ -68,18 +84,21 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         setContentView(R.layout.activity_maps);
 
 
+        mToken = SharedPreferencesHandler.getString(this, TOKEN);
+        mTK_ID = SharedPreferencesHandler.getString(this, TK_ID);
         //Toolbar
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setActionBar(toolbar);
 
         toolbar.collapseActionView();
         // Sử dụng Actionbar
-        ActionBar actionBar = getActionBar();
-        actionBar.setTitle(" Xin chào Bùi Minh Tâm");
-        actionBar.setLogo(R.mipmap.ic_logo);
+        mActionBar = getActionBar();
+//        mActionBar.setTitle(" Xin chào Bùi Minh Tâm");
+        mActionBar.setLogo(R.mipmap.ic_logo);
         ((TextView) toolbar.getChildAt(0)).setTextSize(15);
 
 
+        mDialogSupport = new DialogSupport(this, mAlertDialog, null);
         // Obtain the SupportMapFragment and get notified when the map is ready to be used.
         SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager()
                 .findFragmentById(R.id.map);
@@ -102,6 +121,8 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 //                dialogDiaChiServer();
 //            }
 //        });
+
+        getDataFromServer();
     }
 
     @Override
@@ -156,8 +177,6 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         mMap.setMinZoomPreference(15.5f);
         mMap.setMaxZoomPreference(19f);
 
-        addMarker();
-
         //--- Hien vi tri cua minh----
         //      Cap quyen truy cap GPS
         if (ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED ||
@@ -183,52 +202,63 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 //        mMap.setMyLocationEnabled(true);
 
         //Set event Maps
-        mMap.setMyLocationEnabled(true);
+//        mMap.setMyLocationEnabled(true);
         mMap.setOnMyLocationButtonClickListener(this);
         mMap.setOnMyLocationClickListener(this);
         mMap.setOnInfoWindowClickListener(this);
 
+        layDSXeDangRanh();
+
     }
 
-    private void dialogDiaChiServer() {
 
-        AlertDialog.Builder builder = new AlertDialog.Builder(this);
-        builder.setTitle("Nhap dia chi máy chủ: ");
-
-        final EditText input = new EditText(MapsActivity.this);
-        input.setText(mTvHoten.getText().toString());
-        LinearLayout.LayoutParams lp = new LinearLayout.LayoutParams(
-                LinearLayout.LayoutParams.MATCH_PARENT,
-                LinearLayout.LayoutParams.MATCH_PARENT);
-        input.setLayoutParams(lp);
-        builder.setView(input);
-        builder.setPositiveButton("OK", new DialogInterface.OnClickListener() {
+    private void getDataFromServer() {
+        ConnectServer.getInstance().getApi().layThongTinNguoiDung(mToken, mTK_ID).enqueue(new Callback<ThongTinTaiKhoan>() {
             @Override
-            public void onClick(final DialogInterface dialogInterface, int i) {
-                mTvHoten.setText(input.getText().toString());
-                SharedPreferencesHandler.writeString(MapsActivity.this, Constant.SERVER_SOCKET_URL, input.getText().toString());
+            public void onResponse(Call<ThongTinTaiKhoan> call, Response<ThongTinTaiKhoan> response) {
 
+                if (response.code() == 401) {
+                    mDialogSupport.viewErrorSignOut(MapsActivity.this, "Đã hết phiên đăng nhập !");
+                }
+                if (response.code() == 400) {
+                    try {
+                        mDialogSupport.viewError(response.errorBody().string());
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                    }
+
+                }
+                if (response.code() == 200) {
+                    if (response.body() != null) {
+                        mActionBar.setTitle(" Xin chào " + response.body().getTKHOTEN());
+                        mActionBar.setSubtitle(" " + response.body().getTKID());
+                    }
+
+                }
+            }
+
+            @Override
+            public void onFailure(Call<ThongTinTaiKhoan> call, Throwable t) {
+                mDialogSupport.viewErrorExitApp();
             }
         });
-        mAlertDialog = builder.create();
-        mAlertDialog.setCancelable(false);
-        mAlertDialog.show();
-
     }
 
-    private void viewDialogMuonXe(final double lat, final double longt) {
+    private void viewDialogMuonXe(final String sttXe, final double lat, final double longt) {
         final String toaDo = lat + "," + longt;
         AlertDialog.Builder builder = new AlertDialog.Builder(this);
         builder.setTitle("Mượn xe");
         LayoutInflater inflater = getLayoutInflater();
         View dialogLayout = inflater.inflate(R.layout.dialog_muon_xe, null);
         final TextView textViewSTTXe = dialogLayout.findViewById(R.id.tv_stt_xe);
+        textViewSTTXe.setText(sttXe);
         Button btnMuonXe = dialogLayout.findViewById(R.id.btn_muon_xe);
         btnMuonXe.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 // Gửi socket.IO
-                senDataSocket(0, textViewSTTXe.getText().toString(), toaDo);
+                muonXe(Integer.parseInt(sttXe), lat, longt);
+//                senDataSocket(0, textViewSTTXe.getText().toString(), toaDo);
 
             }
         });
@@ -269,15 +299,15 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     }
 
 
-    private void addMarker() {
-        LatLng dhCanTho = new LatLng(10.030718, 105.7680055);
+    private void addMarker(int sttXe, Double lat, Double lng) {
+        LatLng dhCanTho = new LatLng(lat, lng);
         Marker markerNew = mMap.addMarker(new MarkerOptions().position(dhCanTho)
-                .title("Xe đạp 1").snippet("Đang rảnh"));
+                .title(sttXe + "").snippet("Xe số " + sttXe));
         markerNew.showInfoWindow();
 
     }
 
-    private boolean senDataSocket(final int n, final String sttXe, final String toado) {
+    private void senDataSocket(final int n, final String sttXe, final String toado) {
 
         //...............Test View ................
         Intent test = new Intent(this, DangMuonXeActivity.class);
@@ -292,7 +322,6 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
             Intent intent = new Intent(this, DangMuonXeActivity.class);
             intent.putExtra("STTXE", sttXe);
             startActivity(intent); //Chuyển sang trạng thái dang mượn xe
-            return true;
         } else {
             if (n < 3) { //gọi lại 3 lần
                 new CountDownTimer(2000, 1000) {
@@ -308,11 +337,9 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                 }.start();
                 Toast.makeText(MapsActivity.this, "Đang gọi lại lần " + n, Toast.LENGTH_SHORT).show();
 
-                return false;
             } else {
                 Toast.makeText(MapsActivity.this, "Lỗi! Không thể kết nối đến máy chủ", Toast.LENGTH_SHORT).show();
 
-                return true;
             }
 
 
@@ -320,8 +347,60 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     }
 
     private void dangXuat() {
+        SharedPreferencesHandler.wipeSharedPreferences(this);
     }
 
+    private void muonXe(int idXe, double viTriMuonLat, double viTriMuonLng) {
+        ConnectServer.getInstance().getApi().muonXe(mToken, mTK_ID, idXe, viTriMuonLat, viTriMuonLng).enqueue(new Callback<Message>() {
+            @Override
+            public void onResponse(Call<Message> call, Response<Message> response) {
+                if (response.code() == 400) {
+                    try {
+                        mDialogSupport.viewError(response.errorBody().string());
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                    }
+                }
+                if (response.code() == 200 && response.body() != null) {
+                    Toast.makeText(MapsActivity.this, response.body().getMessage(), Toast.LENGTH_SHORT).show();
+                    startActivity(new Intent(MapsActivity.this, DangMuonXeActivity.class));
+                }
+            }
+
+            @Override
+            public void onFailure(Call<Message> call, Throwable t) {
+                mDialogSupport.viewErrorExitApp();
+            }
+        });
+    }
+
+    private void layDSXeDangRanh() {
+        ConnectServer.getInstance().getApi().layDSXeDangRanh().enqueue(new Callback<List<XeDangRanh>>() {
+            @Override
+            public void onResponse(Call<List<XeDangRanh>> call, Response<List<XeDangRanh>> response) {
+
+                if (response.code() == 400) {
+                    try {
+                        mDialogSupport.viewError(response.errorBody().string());
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                    }
+                }
+                if (response.code() == 200 && response.body() != null) {
+                    List<XeDangRanh> dsXeDangRanh = new ArrayList<>(response.body());
+                    for (XeDangRanh xedangranh : dsXeDangRanh) {
+                        addMarker(xedangranh.getxEID(), xedangranh.getxELAT(), xedangranh.getxELNG());
+                    }
+                }
+
+            }
+
+            @Override
+            public void onFailure(Call<List<XeDangRanh>> call, Throwable t) {
+                mDialogSupport.viewErrorExitApp();
+            }
+        });
+    }
 
     @Override
     public boolean onMyLocationButtonClick() {
@@ -434,7 +513,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         mMap.animateCamera(cameraUpdate, 2000, new GoogleMap.CancelableCallback() {
             @Override
             public void onFinish() {
-                viewDialogMuonXe(latLng.latitude, latLng.longitude);
+                viewDialogMuonXe(marker.getTitle(), latLng.latitude, latLng.longitude);
             }
 
             @Override

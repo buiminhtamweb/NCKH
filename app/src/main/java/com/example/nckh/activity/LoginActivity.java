@@ -3,7 +3,6 @@ package com.example.nckh.activity;
 import android.app.AlertDialog;
 import android.app.ProgressDialog;
 import android.content.Context;
-import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
@@ -16,7 +15,9 @@ import androidx.appcompat.app.AppCompatActivity;
 import com.example.nckh.R;
 import com.example.nckh.data.ConnectServer;
 import com.example.nckh.object.Token;
+import com.example.nckh.object.XeDangMuon;
 import com.example.nckh.util.Constant;
+import com.example.nckh.util.DialogSupport;
 import com.example.nckh.util.SharedPreferencesHandler;
 import com.google.android.material.snackbar.Snackbar;
 
@@ -35,6 +36,7 @@ public class LoginActivity extends AppCompatActivity {
     private Snackbar mSnackbar;
     private ProgressDialog mProgressDialog;
     private String mToken = "";
+    private DialogSupport mDialogSupport;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -49,14 +51,15 @@ public class LoginActivity extends AppCompatActivity {
 
         mEdtUserName.setText(SharedPreferencesHandler.getString(mContext, Constant.TK_ID));
         mEdtPassword.setText(SharedPreferencesHandler.getString(mContext, Constant.PASSWORD));
+        mDialogSupport = new DialogSupport(this, mAlertDialog, mProgressDialog);
 
 
     }
 
     public void login(final View v) {
-//        viewProgressDialog("Đang đăng nhập ... ");
-        Intent i = new Intent(mContext, MapsActivity.class);
-        startActivity(i);
+        mDialogSupport.viewProgressDialog("Đang đăng nhập ... ");
+//        Intent i = new Intent(mContext, MapsActivity.class);
+//        startActivity(i);
         if (checkNullDangNhap()) {
 
             Call<Token> call = ConnectServer.getInstance().getApi().signInAcc(mEdtUserName.getText().toString(),
@@ -65,11 +68,11 @@ public class LoginActivity extends AppCompatActivity {
             call.enqueue(new Callback<Token>() {
                 @Override
                 public void onResponse(Call<Token> call, Response<Token> response) {
-                    hideProgressDialog();
+                    mDialogSupport.hideProgressDialog();
 
                     if (response.code() == 400) {
                         try {
-                            viewError(response.errorBody().string());
+                            mDialogSupport.viewError(response.errorBody().string());
                         } catch (IOException e) {
                             e.printStackTrace();
                         }
@@ -85,16 +88,15 @@ public class LoginActivity extends AppCompatActivity {
 
                         }
 
-
                         Log.e("LOGIN", "onResponse: TOKEN: " + response.body().getToken());
 
+                        String tk_id = mEdtUserName.getText().toString();
+                        String token = "Bearer " + response.body().getToken();
 
-                        viewSucc(mCBRememberMe, "Đã đăng nhập thành công");
-                        SharedPreferencesHandler.writeString(mContext, Constant.TK_ID, mEdtUserName.getText().toString());
-                        SharedPreferencesHandler.writeString(mContext, Constant.TOKEN, "Bearer " + response.body().getToken());
-                        Intent i = new Intent(mContext, MapsActivity.class);
-                        startActivity(i);
-                        finish();
+
+                        SharedPreferencesHandler.writeString(mContext, Constant.TK_ID, tk_id);
+                        SharedPreferencesHandler.writeString(mContext, Constant.TOKEN, token);
+                        kiemTraTrangThai(token, tk_id);
                     }
 
 
@@ -102,11 +104,13 @@ public class LoginActivity extends AppCompatActivity {
 
                 @Override
                 public void onFailure(Call<Token> call, Throwable t) {
-                    viewErrorExitApp();
+                    mDialogSupport.hideProgressDialog();
+                    mDialogSupport.viewErrorExitApp();
                 }
             });
         }
     }
+
     private boolean checkNullDangNhap() {
         if (mEdtUserName.getText().toString().equals("")) {
             mEdtUserName.setError("Chưa nhập tên đăng nhập");
@@ -117,46 +121,51 @@ public class LoginActivity extends AppCompatActivity {
         } else return true;
     }
 
-//    private void kiemTraDangNhap() {
-//        viewProgressDialog("Đang đăng nhập ....");
-//
-//        ConnectServer.getInstance(getApplicationContext()).getApi().kiemTraTrangThaiDangNhap(mToken).enqueue(new Callback<Message>() {
-//            @Override
-//            public void onResponse(Call<Message> call, Response<Message> response) {
-//                Log.e("TAG", "onResponse: " + response.code());
-//                hideProgressDialog();
-//
-//                if (response.code() == 200) {
-//                    Intent i = new Intent(getBaseContext(), MainActivity.class);
-//                    startActivity(i);
-//                    viewSucc(mEdtUserName, "Đã đăng nhập");
-//                    finish();
-//
-//                } else if (response.code() == 401) {
-//                    SharedPreferences.Editor memes = PreferenceManager.getDefaultSharedPreferences(mContext).edit();
-//                    memes.clear();
-//                    memes.apply();
-//                    viewError("Đã hết phiên đăng nhập \nVui lòng đăng nhập lại");
-//                }
-//                if (response.code() == 400) {
-//                    try {
-//                        viewError(response.errorBody().string());
-//                    } catch (IOException e) {
-//                        e.printStackTrace();
-//                    }
-//                }
-//
-//            }
-//
-//            @Override
-//            public void onFailure(Call<Message> call, Throwable t) {
-//
-//                Log.e("TAG", "onFailure: " + t.getMessage());
-//                viewErrorExitApp();
-//
-//            }
-//        });
-//    }
+    private void kiemTraTrangThai(String token, String tk_id) {
+        mDialogSupport.viewProgressDialog("Đang kiểm tra ....");
+        Log.e("LOGIN", "kiemTraTrangThai: Token:->" + token);
+        ConnectServer.getInstance().getApi().layThongTinXeDangMuon(token, tk_id).enqueue(new Callback<XeDangMuon>() {
+            @Override
+            public void onResponse(Call<XeDangMuon> call, Response<XeDangMuon> response) {
+                Log.e("TAG", "onResponse: " + response.code());
+                mDialogSupport.hideProgressDialog();
+
+                if (response.code() == 200) {
+                    if (response.body() == null) {
+                        Intent i = new Intent(LoginActivity.this, MapsActivity.class);
+                        startActivity(i);
+//                        viewSucc(mEdtUserName, "Đã đăng nhập");
+                        finish();
+                    } else {
+                        Intent i = new Intent(LoginActivity.this, DangMuonXeActivity.class);
+//                        i.putExtra("data", (Serializable) response.body());
+                        startActivity(i);
+                    }
+
+
+                } else if (response.code() == 401) {
+                    SharedPreferencesHandler.wipeSharedPreferences(LoginActivity.this);
+                    mDialogSupport.viewErrorSignOut(LoginActivity.this, "Đã hết phiên đăng nhập \nVui lòng đăng nhập lại");
+                }
+                if (response.code() == 400) {
+                    try {
+                        mDialogSupport.viewError(response.errorBody().string());
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                    }
+                }
+
+            }
+
+            @Override
+            public void onFailure(Call<XeDangMuon> call, Throwable t) {
+                mDialogSupport.hideProgressDialog();
+                Log.e("TAG", "onFailure: " + t.getMessage());
+                mDialogSupport.viewErrorExitApp();
+
+            }
+        });
+    }
 
     @Override
     protected void onStart() {
@@ -165,78 +174,21 @@ public class LoginActivity extends AppCompatActivity {
         if (null != bundle) {
             String messsage = bundle.getString("message", null);
             if (messsage != null) {
-                viewError(messsage);
+                mDialogSupport.viewError(messsage);
             }
         } else {
             boolean remember_me = SharedPreferencesHandler.getBoolean(mContext, "remember_me");
             String token = SharedPreferencesHandler.getString(mContext, Constant.TOKEN);
-
+            String tk_id = SharedPreferencesHandler.getString(mContext, Constant.TK_ID);
             Log.e("LOGIN", "onStart: " + remember_me + token);
 
             if (remember_me && !token.equals("")) {
-                startActivity(new Intent(this, MapsActivity.class));
+                kiemTraTrangThai(token, tk_id);
             }
         }
 
     }
 
 
-
-
-//    @Override
-//    protected void onStop() {
-//        super.onStop();
-//    }
-
-    private void viewError(String message) {
-        AlertDialog.Builder builder = new AlertDialog.Builder(this);
-        builder.setTitle("Cảnh báo");
-        builder.setMessage(message);
-        builder.setCancelable(false);
-        builder.setNegativeButton("OK", new DialogInterface.OnClickListener() {
-            @Override
-            public void onClick(DialogInterface dialogInterface, int i) {
-                dialogInterface.dismiss();
-            }
-        });
-        mAlertDialog = builder.create();
-        mAlertDialog.show();
-    }
-
-    private void viewSucc(View view, String message) {
-        mSnackbar = Snackbar.make(view, message, Snackbar.LENGTH_SHORT);
-        mSnackbar.show();
-    }
-
-    private void viewProgressDialog(String message) {
-        if (null == mProgressDialog) {
-            mProgressDialog = new ProgressDialog(this);
-        }
-        mProgressDialog.setMessage(message);
-        mProgressDialog.setCancelable(false);
-        mProgressDialog.show();
-    }
-
-    private void hideProgressDialog() {
-        if (null != mProgressDialog) {
-            mProgressDialog.dismiss();
-        }
-    }
-
-    private void viewErrorExitApp() {
-        AlertDialog.Builder builder = new AlertDialog.Builder(this);
-        builder.setTitle("Cảnh báo");
-        builder.setMessage("Không thể kết nối đến máy chủ ! \nThoát ứng dụng.");
-        builder.setCancelable(false);
-        builder.setNegativeButton("OK", new DialogInterface.OnClickListener() {
-            @Override
-            public void onClick(DialogInterface dialogInterface, int i) {
-                dialogInterface.dismiss();
-                System.exit(1);
-            }
-        });
-        AlertDialog mAlertDialog = builder.create();
-        mAlertDialog.show();
-    }
 }
 

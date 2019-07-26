@@ -2,7 +2,7 @@ package com.example.nckh.util;
 
 public class Constant {
 
-    public static final String URL_SERVER = "http://192.168.0.1:5000/";
+    public static final String URL_SERVER = "http://192.168.137.1:3000";
 //    public static final String URL_SERVER = "https://admin-nlcn.herokuapp.com/";
 
     public static final String TK_ID = "tk_id";

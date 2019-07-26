@@ -29,10 +29,10 @@ public class Doc {
     private Boolean dAXULYHH;
     @SerializedName("HU_HONG_LAT")
     @Expose
-    private Integer hUHONGLAT;
+    private Double hUHONGLAT;
     @SerializedName("HU_HONG_LNG")
     @Expose
-    private Integer hUHONGLNG;
+    private Double hUHONGLNG;
     @SerializedName("createdAt")
     @Expose
     private String createdAt;
@@ -96,19 +96,19 @@ public class Doc {
         this.dAXULYHH = dAXULYHH;
     }
 
-    public Integer getHUHONGLAT() {
+    public Double getHUHONGLAT() {
         return hUHONGLAT;
     }
 
-    public void setHUHONGLAT(Integer hUHONGLAT) {
+    public void setHUHONGLAT(Double hUHONGLAT) {
         this.hUHONGLAT = hUHONGLAT;
     }
 
-    public Integer getHUHONGLNG() {
+    public Double getHUHONGLNG() {
         return hUHONGLNG;
     }
 
-    public void setHUHONGLNG(Integer hUHONGLNG) {
+    public void setHUHONGLNG(Double hUHONGLNG) {
         this.hUHONGLNG = hUHONGLNG;
     }
 

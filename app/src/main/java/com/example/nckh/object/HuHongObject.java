@@ -18,6 +18,12 @@ public class HuHongObject {
     @Expose
     private String loaiHuHong;
 
+    public HuHongObject(String sttXe, String thoiGianHuhong, String viTriHuHong, String loaiHuHong) {
+        this.sttXe = sttXe;
+        this.thoiGianHuhong = thoiGianHuhong;
+        this.viTriHuHong = viTriHuHong;
+        this.loaiHuHong = loaiHuHong;
+    }
 
     public HuHongObject() {
     }

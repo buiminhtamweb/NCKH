@@ -2,6 +2,8 @@ package com.example.nckh.fragment;
 
 import android.app.AlertDialog;
 import android.app.ProgressDialog;
+import android.content.Intent;
+import android.net.Uri;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -16,13 +18,25 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.nckh.R;
 import com.example.nckh.adapter.RecyLSMuonXeAdapter;
-import com.example.nckh.object.MuonXeObject;
+import com.example.nckh.data.ConnectServer;
+import com.example.nckh.object.LSMuonXe.Doc;
+import com.example.nckh.object.LSMuonXe.LSMuonXe;
+import com.example.nckh.util.DialogSupport;
+import com.example.nckh.util.SharedPreferencesHandler;
 import com.google.android.material.snackbar.Snackbar;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
-public class LichSuMuonXeFrag extends Fragment {
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Response;
+
+import static com.example.nckh.util.Constant.TK_ID;
+import static com.example.nckh.util.Constant.TOKEN;
+
+public class LichSuMuonXeFrag extends Fragment implements RecyLSMuonXeAdapter.onClickListener {
 
     private static final String TABLE_CALL = "call-table-";
     private static final String TAG = "LichSuMuonXeFrag";
@@ -32,13 +46,21 @@ public class LichSuMuonXeFrag extends Fragment {
     private RecyclerView mRecyLichSuMuonXe;
 
     private RecyLSMuonXeAdapter mMuonXeAdapter;
-    private List<MuonXeObject> mMuonXeObjectList = new ArrayList<>();
+    private List<Doc> mMuonXeObjectList = new ArrayList<>();
     private TextView mTvViewErr;
+    private ProgressDialog mProgressDialog;
+    private String mToken;
+    private String mTK_ID;
+    private int mPageCurent = 1, mPageMax = 1;
+    private DialogSupport mDialogSupport;
 
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.frag_lich_su_muon_xe, container, false);
+
+        mDialogSupport = new DialogSupport(getContext(), mAlertDialog, mProgressDialog);
+
         mRecyLichSuMuonXe = (RecyclerView) view.findViewById(R.id.recy_lich_su_muon_xe);
         RecyclerView.LayoutManager layoutManager = new LinearLayoutManager(getContext(), RecyclerView.VERTICAL, false);
         mRecyLichSuMuonXe.setLayoutManager(layoutManager);
@@ -46,29 +68,73 @@ public class LichSuMuonXeFrag extends Fragment {
         mMuonXeAdapter = new RecyLSMuonXeAdapter(mMuonXeObjectList);
         mRecyLichSuMuonXe.setAdapter(mMuonXeAdapter);
 
+        mMuonXeAdapter.setOnClickListener(this);
+        mMuonXeAdapter.setOnScrollListener(new RecyLSMuonXeAdapter.onScrollListener() {
+            @Override
+            public void onScroll(int position) {
+                if (position + 2 == mMuonXeObjectList.size() && mPageCurent <= mPageMax) {
+                    layLSMuonXe(mPageCurent + 1);
+                }
+            }
+        });
         mTvViewErr = (TextView) view.findViewById(R.id.tv_view_err);
 
+        mToken = SharedPreferencesHandler.getString(getContext(), TOKEN);
+        mTK_ID = SharedPreferencesHandler.getString(getContext(), TK_ID);
 
-        getDataFromServer();
+
+
         return view;
     }
 
 
-
+    @Override
+    public void onStart() {
+        super.onStart();
+        mMuonXeObjectList.clear();
+        layLSMuonXe(1);
+    }
 
     private void viewSucc(View view, String message) {
         Snackbar.make(view, message, Snackbar.LENGTH_LONG).show();
     }
 
-    private void getDataFromServer() {
-        if (getContext() != null) {
-            mProgress = new ProgressDialog(getContext());
-            mProgress.setMessage("Đang tải dữ liệu. Vui lòng chờ !");
-            mProgress.setProgressStyle(ProgressDialog.STYLE_HORIZONTAL);
-            mProgress.setIndeterminate(true);
-            mProgress.show();
-        }
+    private void layLSMuonXe(int page) {
+        mPageCurent = page;
+        mDialogSupport.viewProgressDialog("Đang tải ... ");
+        ConnectServer.getInstance().getApi().layLSMuonXe(mToken, mTK_ID, page).enqueue(new Callback<LSMuonXe>() {
+            @Override
+            public void onResponse(Call<LSMuonXe> call, Response<LSMuonXe> response) {
+                mDialogSupport.hideProgressDialog();
+                if (response.code() == 400) {
+                    try {
+                        mDialogSupport.viewError(response.errorBody().string());
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                    }
+                }
+                if (response.code() == 200 && response.body().getTotal() == 0) {
+                    mTvViewErr.setVisibility(View.VISIBLE);
+                } else {
+//                    for (Doc doc : response.body().getDocs() ) {
+                    mTvViewErr.setVisibility(View.GONE);
+                    if (response.body() != null) {
+                        mMuonXeObjectList.addAll(response.body().getDocs());
+                        mPageMax = response.body().getPages();
+                        mMuonXeAdapter.notifyDataSetChanged();
+                    }
+//                    }
 
+                }
+
+            }
+
+            @Override
+            public void onFailure(Call<LSMuonXe> call, Throwable t) {
+                mDialogSupport.hideProgressDialog();
+                showErrDisconnect(mRecyLichSuMuonXe);
+            }
+        });
 
     }
 
@@ -77,17 +143,6 @@ public class LichSuMuonXeFrag extends Fragment {
         super.onStop();
         if (mAlertDialog != null && mAlertDialog.isShowing()) {
             mAlertDialog.cancel();
-        }
-    }
-
-
-
-
-    private void viewError(String message) {
-        if (mRecyLichSuMuonXe != null) {
-            final Snackbar snackbar = Snackbar.make(mRecyLichSuMuonXe, message, Snackbar.LENGTH_SHORT);
-
-            snackbar.show();
         }
     }
 
@@ -101,13 +156,22 @@ public class LichSuMuonXeFrag extends Fragment {
             snackbar.setAction("Thử lại", new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
-//                    mGoiMonList.clear();
-                    getDataFromServer();
+                    mMuonXeObjectList.clear();
+                    layLSMuonXe(1);
                 }
             });
 
             snackbar.show();
         }
 
+    }
+
+    @Override
+    public void onTextGPSClick(String sttXe, String toaDo) {
+        String[] parts = toaDo.split("-");
+        String myLatitude = parts[0]; // 004
+        String myLongitude = parts[1];
+        Intent intent = new Intent(Intent.ACTION_VIEW, Uri.parse("geo:<" + myLatitude + ">,<" + myLongitude + ">?q=<" + myLatitude + ">,<" + myLongitude + ">(" + sttXe + ")"));
+        startActivity(intent);
     }
 }

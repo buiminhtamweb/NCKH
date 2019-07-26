@@ -20,19 +20,19 @@ public class Doc {
     private String mUONTHOIGIAN;
     @SerializedName("TRA_THOIGIAN")
     @Expose
-    private Object tRATHOIGIAN;
+    private String tRATHOIGIAN;
     @SerializedName("MUON_VITRI_LAT")
     @Expose
-    private Integer mUONVITRILAT;
+    private Double mUONVITRILAT;
     @SerializedName("MUON_VITRI_LNG")
     @Expose
-    private Integer mUONVITRILNG;
+    private Double mUONVITRILNG;
     @SerializedName("TRA_VITRI_LAT")
     @Expose
-    private Integer tRAVITRILAT;
+    private Double tRAVITRILAT;
     @SerializedName("TRA_VITRI_LNG")
     @Expose
-    private Integer tRAVITRILNG;
+    private Double tRAVITRILNG;
     @SerializedName("createdAt")
     @Expose
     private String createdAt;
@@ -72,43 +72,43 @@ public class Doc {
         this.mUONTHOIGIAN = mUONTHOIGIAN;
     }
 
-    public Object getTRATHOIGIAN() {
+    public String getTRATHOIGIAN() {
         return tRATHOIGIAN;
     }
 
-    public void setTRATHOIGIAN(Object tRATHOIGIAN) {
+    public void setTRATHOIGIAN(String tRATHOIGIAN) {
         this.tRATHOIGIAN = tRATHOIGIAN;
     }
 
-    public Integer getMUONVITRILAT() {
+    public Double getMUONVITRILAT() {
         return mUONVITRILAT;
     }
 
-    public void setMUONVITRILAT(Integer mUONVITRILAT) {
+    public void setMUONVITRILAT(Double mUONVITRILAT) {
         this.mUONVITRILAT = mUONVITRILAT;
     }
 
-    public Integer getMUONVITRILNG() {
+    public Double getMUONVITRILNG() {
         return mUONVITRILNG;
     }
 
-    public void setMUONVITRILNG(Integer mUONVITRILNG) {
+    public void setMUONVITRILNG(Double mUONVITRILNG) {
         this.mUONVITRILNG = mUONVITRILNG;
     }
 
-    public Integer getTRAVITRILAT() {
+    public Double getTRAVITRILAT() {
         return tRAVITRILAT;
     }
 
-    public void setTRAVITRILAT(Integer tRAVITRILAT) {
+    public void setTRAVITRILAT(Double tRAVITRILAT) {
         this.tRAVITRILAT = tRAVITRILAT;
     }
 
-    public Integer getTRAVITRILNG() {
+    public Double getTRAVITRILNG() {
         return tRAVITRILNG;
     }
 
-    public void setTRAVITRILNG(Integer tRAVITRILNG) {
+    public void setTRAVITRILNG(Double tRAVITRILNG) {
         this.tRAVITRILNG = tRAVITRILNG;
     }
 

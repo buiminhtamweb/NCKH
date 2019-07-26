@@ -16,7 +16,7 @@ public class ConnectServer {
     private ConnectServer() {
 
         mRetrofit = new Retrofit.Builder()
-                .baseUrl(Constant.URL_SERVER + "api/")
+                .baseUrl(Constant.URL_SERVER + "/v1/api/")
 //                .client(mClient)
                 .addConverterFactory(GsonConverterFactory.create())
                 .build();

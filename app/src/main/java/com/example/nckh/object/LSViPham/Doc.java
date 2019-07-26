@@ -17,10 +17,10 @@ public class Doc {
     private Boolean dAXULYVP;
     @SerializedName("VP_LAT")
     @Expose
-    private Integer vPLAT;
+    private Double vPLAT;
     @SerializedName("VP_LNG")
     @Expose
-    private Integer vPLNG;
+    private Double vPLNG;
     @SerializedName("loi")
     @Expose
     private Loi loi;
@@ -52,19 +52,19 @@ public class Doc {
         this.dAXULYVP = dAXULYVP;
     }
 
-    public Integer getVPLAT() {
+    public Double getVPLAT() {
         return vPLAT;
     }
 
-    public void setVPLAT(Integer vPLAT) {
+    public void setVPLAT(Double vPLAT) {
         this.vPLAT = vPLAT;
     }
 
-    public Integer getVPLNG() {
+    public Double getVPLNG() {
         return vPLNG;
     }
 
-    public void setVPLNG(Integer vPLNG) {
+    public void setVPLNG(Double vPLNG) {
         this.vPLNG = vPLNG;
     }
 

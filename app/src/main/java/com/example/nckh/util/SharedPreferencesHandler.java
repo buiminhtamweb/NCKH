@@ -10,10 +10,10 @@ public class SharedPreferencesHandler {
     public static void wipeSharedPreferences(Context ctx) {
         SharedPreferences sharedPref = ctx.getSharedPreferences(ctx.getString(R.string.sharedPreferences), Context.MODE_PRIVATE);
         SharedPreferences.Editor editor = sharedPref.edit();
-        if (getBoolean(ctx, "rememberMe")) {
-            editor.putString("user", getString(ctx, "user"));
-            editor.putString("password", getString(ctx, "password"));
-        }
+//        if (getBoolean(ctx, "rememberMe")) {
+//            editor.putString("user", getString(ctx, "user"));
+//            editor.putString("password", getString(ctx, "password"));
+//        }
         editor.clear();
         editor.apply();
     }

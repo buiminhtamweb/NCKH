@@ -20,19 +20,19 @@ public class XeDangMuon {
     private String mUONTHOIGIAN;
     @SerializedName("TRA_THOIGIAN")
     @Expose
-    private Object tRATHOIGIAN;
+    private String tRATHOIGIAN;
     @SerializedName("MUON_VITRI_LAT")
     @Expose
-    private Integer mUONVITRILAT;
+    private Double mUONVITRILAT;
     @SerializedName("MUON_VITRI_LNG")
     @Expose
-    private Integer mUONVITRILNG;
+    private Double mUONVITRILNG;
     @SerializedName("TRA_VITRI_LAT")
     @Expose
-    private Integer tRAVITRILAT;
+    private Double tRAVITRILAT;
     @SerializedName("TRA_VITRI_LNG")
     @Expose
-    private Integer tRAVITRILNG;
+    private Double tRAVITRILNG;
     @SerializedName("createdAt")
     @Expose
     private String createdAt;
@@ -40,75 +40,75 @@ public class XeDangMuon {
     @Expose
     private String updatedAt;
 
-    public Integer getMUONTRAID() {
+    public Integer getmUONTRAID() {
         return mUONTRAID;
     }
 
-    public void setMUONTRAID(Integer mUONTRAID) {
+    public void setmUONTRAID(Integer mUONTRAID) {
         this.mUONTRAID = mUONTRAID;
     }
 
-    public String getTKID() {
+    public String gettKID() {
         return tKID;
     }
 
-    public void setTKID(String tKID) {
+    public void settKID(String tKID) {
         this.tKID = tKID;
     }
 
-    public Integer getXEID() {
+    public Integer getxEID() {
         return xEID;
     }
 
-    public void setXEID(Integer xEID) {
+    public void setxEID(Integer xEID) {
         this.xEID = xEID;
     }
 
-    public String getMUONTHOIGIAN() {
+    public String getmUONTHOIGIAN() {
         return mUONTHOIGIAN;
     }
 
-    public void setMUONTHOIGIAN(String mUONTHOIGIAN) {
+    public void setmUONTHOIGIAN(String mUONTHOIGIAN) {
         this.mUONTHOIGIAN = mUONTHOIGIAN;
     }
 
-    public Object getTRATHOIGIAN() {
+    public String gettRATHOIGIAN() {
         return tRATHOIGIAN;
     }
 
-    public void setTRATHOIGIAN(Object tRATHOIGIAN) {
+    public void settRATHOIGIAN(String tRATHOIGIAN) {
         this.tRATHOIGIAN = tRATHOIGIAN;
     }
 
-    public Integer getMUONVITRILAT() {
+    public Double getmUONVITRILAT() {
         return mUONVITRILAT;
     }
 
-    public void setMUONVITRILAT(Integer mUONVITRILAT) {
+    public void setmUONVITRILAT(Double mUONVITRILAT) {
         this.mUONVITRILAT = mUONVITRILAT;
     }
 
-    public Integer getMUONVITRILNG() {
+    public Double getmUONVITRILNG() {
         return mUONVITRILNG;
     }
 
-    public void setMUONVITRILNG(Integer mUONVITRILNG) {
+    public void setmUONVITRILNG(Double mUONVITRILNG) {
         this.mUONVITRILNG = mUONVITRILNG;
     }
 
-    public Integer getTRAVITRILAT() {
+    public Double gettRAVITRILAT() {
         return tRAVITRILAT;
     }
 
-    public void setTRAVITRILAT(Integer tRAVITRILAT) {
+    public void settRAVITRILAT(Double tRAVITRILAT) {
         this.tRAVITRILAT = tRAVITRILAT;
     }
 
-    public Integer getTRAVITRILNG() {
+    public Double gettRAVITRILNG() {
         return tRAVITRILNG;
     }
 
-    public void setTRAVITRILNG(Integer tRAVITRILNG) {
+    public void settRAVITRILNG(Double tRAVITRILNG) {
         this.tRAVITRILNG = tRAVITRILNG;
     }
 
@@ -127,5 +127,4 @@ public class XeDangMuon {
     public void setUpdatedAt(String updatedAt) {
         this.updatedAt = updatedAt;
     }
-
 }

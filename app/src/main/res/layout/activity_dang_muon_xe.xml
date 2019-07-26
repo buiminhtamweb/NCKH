@@ -5,13 +5,14 @@
     android:background="@color/design_default_color_primary_dark">
 
     <ImageView
-        android:padding="12dp"
+        android:id="@+id/img_lich_su_icon"
         android:layout_width="48dp"
         android:layout_height="48dp"
         android:layout_alignParentEnd="true"
         android:layout_marginTop="8dp"
         android:layout_marginEnd="16dp"
         android:contentDescription="Lịch sử mượn xe"
+        android:padding="12dp"
         android:src="@drawable/ic_history_black_24dp" />
 
     <LinearLayout
@@ -24,7 +25,9 @@
             android:layout_width="200dp"
             android:layout_height="200dp"
             android:layout_gravity="center"
-            android:layout_margin="48dp"
+            android:layout_marginStart="48dp"
+            android:layout_marginTop="48dp"
+            android:layout_marginEnd="48dp"
             android:background="@drawable/circle_backround_white">
 
             <TextView
@@ -43,59 +46,62 @@
                 android:layout_margin="4dp"
                 android:src="@drawable/circle_backround_white" />
 
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_below="@id/tv_stt_xe_dang_muon"
-                android:layout_centerHorizontal="true"
-                android:text="Đang mượn xe"
-                android:textColor="@color/white" />
+
         </RelativeLayout>
 
+        <TextView
+            android:id="@+id/tv_thoi_gian_muon"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:layout_marginTop="4dp"
+            android:text="Mượn vào lúc: 10:20 2/3/2019"
+            android:textColor="@color/white" />
+
 
         <Button
-            android:layout_marginTop="4dp"
             android:layout_width="200dp"
             android:layout_height="wrap_content"
             android:layout_gravity="center"
+            android:layout_marginTop="24dp"
             android:background="@drawable/backround_edittext"
+            android:onClick="traXe"
             android:text="Trả xe"
             android:textAllCaps="false"
-            android:onClick="traXe"
             android:textColor="@color/colorPrimaryDark" />
 
         <Button
-            android:layout_marginTop="4dp"
             android:layout_width="200dp"
             android:layout_height="wrap_content"
             android:layout_gravity="center"
+            android:layout_marginTop="4dp"
             android:background="@drawable/backround_edittext"
+            android:onClick="chiDuongDenXe"
             android:text="Chỉ đường đến xe"
             android:textAllCaps="false"
-            android:onClick="chiDuongDenXe"
             android:textColor="@color/colorPrimaryDark" />
 
         <Button
-            android:layout_marginTop="4dp"
-            android:textColor="@color/colorPrimaryDark"
-            android:background="@drawable/backround_edittext"
-            android:textAllCaps="false"
             android:layout_width="200dp"
             android:layout_height="wrap_content"
             android:layout_gravity="center"
+            android:layout_marginTop="4dp"
+            android:background="@drawable/backround_edittext"
             android:onClick="baoHuHong"
-            android:text="Báo hư hỏng" />
+            android:text="Báo hư hỏng"
+            android:textAllCaps="false"
+            android:textColor="@color/colorPrimaryDark" />
 
         <Button
-            android:layout_marginTop="4dp"
-            android:textColor="@color/colorPrimaryDark"
-            android:background="@drawable/backround_edittext"
-            android:textAllCaps="false"
             android:layout_width="200dp"
             android:layout_height="wrap_content"
             android:layout_gravity="center"
+            android:layout_marginTop="4dp"
+            android:background="@drawable/backround_edittext"
             android:onClick="anUngDung"
-            android:text="Ẩn ứng dụng" />
+            android:text="Ẩn ứng dụng"
+            android:textAllCaps="false"
+            android:textColor="@color/colorPrimaryDark" />
     </LinearLayout>
 
 </RelativeLayout>

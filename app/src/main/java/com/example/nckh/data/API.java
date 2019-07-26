@@ -7,6 +7,9 @@ import com.example.nckh.object.Message;
 import com.example.nckh.object.ThongTinTaiKhoan;
 import com.example.nckh.object.Token;
 import com.example.nckh.object.XeDangMuon;
+import com.example.nckh.object.XeDangRanh;
+
+import java.util.List;
 
 import retrofit2.Call;
 import retrofit2.http.Field;
@@ -49,11 +52,24 @@ public interface API {
     @POST("taikhoan/{TK_ID}/muonxe")
     Call<Message> muonXe(@Header("Authorization") String token,
                          @Path("TK_ID") String TK_ID,
-                         @Field("XE_ID") int XE_ID);
+                         @Field("XE_ID") int XE_ID,
+                         @Field("MUON_VITRI_LAT") Double viTriMuonLat,
+                         @Field("MUON_VITRI_LNG") Double viTriMuonLng
+    );
 
     //Thông tin xe đang mượn
     @GET("taikhoan/{TK_ID}/muonxe")
     Call<XeDangMuon> layThongTinXeDangMuon(@Header("Authorization") String token,
                                            @Path("TK_ID") String TK_ID);
 
+    //Danh sách xe đang rảnh
+    @GET("xe")
+    Call<List<XeDangRanh>> layDSXeDangRanh();
+
+    //Danh sách xe đang rảnh
+    @GET("xe/{XE_ID}")
+    Call<XeDangMuon> baoHuHong(@Header("Authorization") String token,
+                               @Path("XE_ID") String XE_ID,
+                               @Field("TK_ID") String TK_ID,
+                               @Field("HH_MOTA") String HH_MOTA);
 }

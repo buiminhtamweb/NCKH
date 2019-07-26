@@ -1,33 +1,48 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:orientation="vertical"
-    android:padding="8dp"
     android:layout_width="match_parent"
-    android:layout_height="wrap_content">
+    android:layout_height="wrap_content"
+    android:layout_marginTop="1dp"
+    android:background="@color/white"
+    android:orientation="vertical"
+    android:padding="8dp">
 
     <TextView
         android:id="@+id/tv_item_stt_xe"
-        android:text="Số thứ tự xe"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:text="Số thứ tự xe"
         android:textSize="18sp"
         android:textStyle="bold" />
 
     <TextView
         android:id="@+id/tv_item_thoi_gian_hu_hong"
-        android:text="19/7/2019"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content" />
+        android:layout_height="wrap_content"
+        android:text="19/7/2019" />
 
-    <TextView
-        android:id="@+id/tv_item_vi_tri_hu_hong"
-        android:text="Tại vị trí: 11.1000000;105.02392343"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content" />
+    <LinearLayout
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal">
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Tại vị trí: " />
+
+        <TextView
+            android:id="@+id/tv_item_vi_tri_hu_hong"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="11.1000000;105.02392343"
+            android:textColor="@color/blue" />
+    </LinearLayout>
+
 
     <TextView
         android:id="@+id/tv_item_loai_hu_hong"
-        android:text="Bị bể bánh xe"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content" />
+        android:layout_height="wrap_content"
+        android:text="Bị bể bánh xe" />
 </LinearLayout>
