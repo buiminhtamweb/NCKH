@@ -59,16 +59,16 @@
             android:textColor="@color/white" />
 
 
-        <Button
-            android:layout_width="200dp"
-            android:layout_height="wrap_content"
-            android:layout_gravity="center"
-            android:layout_marginTop="24dp"
-            android:background="@drawable/backround_edittext"
-            android:onClick="traXe"
-            android:text="Trả xe"
-            android:textAllCaps="false"
-            android:textColor="@color/colorPrimaryDark" />
+        <!--<Button-->
+        <!--android:layout_width="200dp"-->
+        <!--android:layout_height="wrap_content"-->
+        <!--android:layout_gravity="center"-->
+        <!--android:layout_marginTop="24dp"-->
+        <!--android:background="@drawable/backround_edittext"-->
+        <!--android:onClick="traXe"-->
+        <!--android:text="Trả xe"-->
+        <!--android:textAllCaps="false"-->
+        <!--android:textColor="@color/colorPrimaryDark" />-->
 
         <Button
             android:layout_width="200dp"

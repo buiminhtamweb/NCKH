@@ -9,10 +9,10 @@ public class Doc {
     @SerializedName("HH_ID")
     @Expose
     private Integer hHID;
-    @SerializedName("TK_ID")
+    @SerializedName("taikhoanTKID")
     @Expose
     private String tKID;
-    @SerializedName("XE_ID")
+    @SerializedName("xeXEID")
     @Expose
     private Integer xEID;
     @SerializedName("HH_MOTA")

@@ -20,6 +20,7 @@ import androidx.appcompat.app.AppCompatActivity;
 
 import com.example.nckh.R;
 import com.example.nckh.data.ConnectServer;
+import com.example.nckh.object.Message;
 import com.example.nckh.object.XeDangMuon;
 import com.example.nckh.util.DialogSupport;
 import com.example.nckh.util.SharedPreferencesHandler;
@@ -118,7 +119,6 @@ public class DangMuonXeActivity extends AppCompatActivity {
                         startActivity(new Intent(DangMuonXeActivity.this, MapsActivity.class));
                     }
 
-
                 }
             }
 
@@ -192,6 +192,38 @@ public class DangMuonXeActivity extends AppCompatActivity {
                 if(spinner.getSelectedItemPosition() == 0){
                     Toast.makeText(DangMuonXeActivity.this, "Chưa chọn loại hư hỏng", Toast.LENGTH_SHORT).show();
                 }else {
+                    String huHong = "";
+                    Log.e("SPINER", "onClick: " + spinner.getSelectedItem().toString());
+                    if (editTextHuHongKhac.getVisibility() == View.VISIBLE) {
+                        huHong = editTextHuHongKhac.getText().toString();
+                    } else huHong = spinner.getSelectedItem().toString();
+
+                    ConnectServer.getInstance().getApi().baoHuHong(mToken, mTvXeMuon.getText().toString(), mTK_ID, huHong).enqueue(new Callback<Message>() {
+                        @Override
+                        public void onResponse(Call<Message> call, Response<Message> response) {
+                            if (response.code() == 401) {
+                                mDialogSupport.viewErrorSignOut(DangMuonXeActivity.this, "Đã hết phiên đăng nhập !");
+                            }
+                            if (response.code() == 400) {
+                                try {
+                                    if (response.errorBody() != null) {
+                                        mDialogSupport.viewError(response.errorBody().string());
+                                    }
+                                } catch (IOException e) {
+                                    e.printStackTrace();
+                                }
+
+                            }
+                            if (response.code() == 200 && response.body() != null) {
+                                Toast.makeText(DangMuonXeActivity.this, response.body().getMessage(), Toast.LENGTH_SHORT).show();
+                            }
+                        }
+
+                        @Override
+                        public void onFailure(Call<Message> call, Throwable t) {
+                            mDialogSupport.viewErrorExitApp();
+                        }
+                    });
 
                 }
             }

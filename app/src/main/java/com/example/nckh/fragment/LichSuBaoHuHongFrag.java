@@ -118,9 +118,7 @@ public class LichSuBaoHuHongFrag extends Fragment implements RecyLSBaoHuHongAdap
                 showErrDisconnect(mRecyclerView);
             }
         });
-
     }
-
 
     @Override
     public void onStart() {
@@ -128,8 +126,6 @@ public class LichSuBaoHuHongFrag extends Fragment implements RecyLSBaoHuHongAdap
         mHuHongObjectList.clear();
         layDanhSachHuHong(1);
     }
-
-
 
 
     public void showErrDisconnect(View view) {

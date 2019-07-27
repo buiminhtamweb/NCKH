@@ -6,6 +6,7 @@ import com.example.nckh.object.LSViPham.LSViPham;
 import com.example.nckh.object.Message;
 import com.example.nckh.object.ThongTinTaiKhoan;
 import com.example.nckh.object.Token;
+import com.example.nckh.object.XE;
 import com.example.nckh.object.XeDangMuon;
 import com.example.nckh.object.XeDangRanh;
 
@@ -62,14 +63,19 @@ public interface API {
     Call<XeDangMuon> layThongTinXeDangMuon(@Header("Authorization") String token,
                                            @Path("TK_ID") String TK_ID);
 
+    //    Thogno tin xe
+    @GET("xe/{XE_ID}")
+    Call<XE> layThongTinXe(@Path("XE_ID") String XE_ID);
+
     //Danh sách xe đang rảnh
     @GET("xe")
     Call<List<XeDangRanh>> layDSXeDangRanh();
 
     //Danh sách xe đang rảnh
-    @GET("xe/{XE_ID}")
-    Call<XeDangMuon> baoHuHong(@Header("Authorization") String token,
-                               @Path("XE_ID") String XE_ID,
-                               @Field("TK_ID") String TK_ID,
-                               @Field("HH_MOTA") String HH_MOTA);
+    @FormUrlEncoded
+    @POST("xe/{XE_ID}")
+    Call<Message> baoHuHong(@Header("Authorization") String token,
+                            @Path("XE_ID") String XE_ID,
+                            @Field("TK_ID") String TK_ID,
+                            @Field("HH_MOTA") String HH_MOTA);
 }

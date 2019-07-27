@@ -9,10 +9,10 @@ public class Muontra {
     @SerializedName("MUONTRA_ID")
     @Expose
     private Integer mUONTRAID;
-    @SerializedName("TK_ID")
+    @SerializedName("taikhoanTKID")
     @Expose
     private String tKID;
-    @SerializedName("XE_ID")
+    @SerializedName("xeXEID")
     @Expose
     private Integer xEID;
 
