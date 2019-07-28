@@ -29,6 +29,8 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Timer;
+import java.util.TimerTask;
 
 import retrofit2.Call;
 import retrofit2.Callback;
@@ -39,6 +41,7 @@ import static com.example.nckh.util.Constant.TK_ID;
 import static com.example.nckh.util.Constant.TOKEN;
 
 public class DangMuonXeActivity extends AppCompatActivity {
+    private static final String TAG = "DAG_MUON_XE";
     private TextView mTvXeMuon;
     private AlertDialog mAlertDialog;
     private List<String> mDSLoi = new ArrayList<>();
@@ -48,6 +51,8 @@ public class DangMuonXeActivity extends AppCompatActivity {
     private TextView mTvThoiGianMuon;
     private DialogSupport mDialogSupport;
     private ImageView mImgLichSuIcon;
+    private Timer mTimer = new Timer();
+    private boolean isOnstart = false;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -82,13 +87,31 @@ public class DangMuonXeActivity extends AppCompatActivity {
         //Khoi tạo danh sach loi
         mDSLoi.addAll(Arrays.asList(getResources().getStringArray(R.array.danh_sach_hu_hong)));
 
+        mTimer.scheduleAtFixedRate(new TimerTask() {
+                                       @Override
+                                       public void run() {
+                                           //Called each time when 1000 milliseconds (1 second) (the period parameter)
+                                           runOnUiThread(new Runnable() {
+                                               @Override
+                                               public void run() {
+                                                   if (isOnstart)
+                                                       getDataFromServer();
+                                               }
+                                           });
+                                       }
+                                   },
+                //Set how long before to start calling the TimerTask (in milliseconds)
+                0,
+                //Set the amount of time between each execution (in milliseconds)
+                3000);
+
 
     }
 
     @Override
     protected void onStart() {
         super.onStart();
-        getDataFromServer();
+        isOnstart = true;
     }
 
     private void getDataFromServer() {
@@ -135,9 +158,6 @@ public class DangMuonXeActivity extends AppCompatActivity {
 
     public void baoHuHong(View view) {
         viewDialogBaoHuHong();
-    }
-
-    public void traXe(View view) {
     }
 
     private void viewDialogBaoHuHong() {
@@ -189,9 +209,9 @@ public class DangMuonXeActivity extends AppCompatActivity {
                 if (mAlertDialog.isShowing()) {
                     mAlertDialog.dismiss();
                 }
-                if(spinner.getSelectedItemPosition() == 0){
+                if (spinner.getSelectedItemPosition() == 0) {
                     Toast.makeText(DangMuonXeActivity.this, "Chưa chọn loại hư hỏng", Toast.LENGTH_SHORT).show();
-                }else {
+                } else {
                     String huHong = "";
                     Log.e("SPINER", "onClick: " + spinner.getSelectedItem().toString());
                     if (editTextHuHongKhac.getVisibility() == View.VISIBLE) {
@@ -246,4 +266,20 @@ public class DangMuonXeActivity extends AppCompatActivity {
         startActivity(startMain);
     }
 
+    @Override
+    protected void onStop() {
+        super.onStop();
+
+        Log.e(TAG, "onStart: ");
+        isOnstart = false;
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        if (mTimer != null) {
+            mTimer.cancel();
+        }
+
+    }
 }

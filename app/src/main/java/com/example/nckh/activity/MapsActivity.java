@@ -42,14 +42,18 @@ import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
+import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.CameraPosition;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
+import com.google.maps.android.ui.IconGenerator;
 
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Timer;
+import java.util.TimerTask;
 
 import retrofit2.Call;
 import retrofit2.Callback;
@@ -60,7 +64,7 @@ import static com.example.nckh.util.Constant.TK_ID;
 import static com.example.nckh.util.Constant.TOKEN;
 
 public class MapsActivity extends FragmentActivity implements OnMapReadyCallback, LocationListener, GoogleMap.OnMyLocationButtonClickListener,
-        GoogleMap.OnMyLocationClickListener, GoogleMap.OnInfoWindowClickListener {
+        GoogleMap.OnMyLocationClickListener, GoogleMap.OnInfoWindowClickListener, GoogleMap.OnMarkerClickListener {
 
     private static final int MY_LOCATION_REQUEST_CODE = 2;
     private static final int REQUEST_LOCATION = 123;
@@ -76,7 +80,11 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     private String mToken;
     private String mTK_ID;
     private DialogSupport mDialogSupport;
+    private Timer mTimer = new Timer();
+    private boolean isMapReady = false;
+    private boolean isOnstart = false;
 
+    android.os.Handler customHandler;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -153,7 +161,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     @Override
     public void onMapReady(GoogleMap googleMap) {
         mMap = googleMap;
-
+        isMapReady = true;
         //Set Maps Ui
         mMap.getUiSettings().setCompassEnabled(true);
         mMap.getUiSettings().setZoomControlsEnabled(true);
@@ -205,9 +213,48 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 //        mMap.setMyLocationEnabled(true);
         mMap.setOnMyLocationButtonClickListener(this);
         mMap.setOnMyLocationClickListener(this);
+        mMap.setOnMarkerClickListener(this);
         mMap.setOnInfoWindowClickListener(this);
 
-        layDSXeDangRanh();
+//        customHandler = new android.os.Handler();
+////        customHandler.postDelayed(new Runnable() {
+////            public void run() {
+////                runOnUiThread(new Runnable() {
+////                    @Override
+////                    public void run() {
+////
+////                        layDSXeDangRanh();
+////                        if (isMapReady && isOnstart)
+////                            customHandler.postDelayed(this, 2000);
+////                    }
+////                });
+////                //write here whaterver you want to repeat
+////
+////            }
+////        }, 0);
+
+        try {
+            mTimer.scheduleAtFixedRate(new TimerTask() {
+                                           @Override
+                                           public void run() {
+                                               runOnUiThread(new Runnable() {
+                                                   @Override
+                                                   public void run() {
+                                                       if (isOnstart) {
+                                                           Log.e(TAG, "run: onMapReady ");
+                                                           layDSXeDangRanh();
+                                                       }
+
+                                                   }
+                                               });
+                                           }
+
+                                       },
+                    0,
+                    2000);
+        } catch (Exception ignored) {
+
+        }
 
     }
 
@@ -247,7 +294,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     private void viewDialogMuonXe(final String sttXe, final double lat, final double longt) {
         final String toaDo = lat + "," + longt;
         AlertDialog.Builder builder = new AlertDialog.Builder(this);
-        builder.setTitle("Mượn xe");
+//        builder.setTitle("Mượn xe");
         LayoutInflater inflater = getLayoutInflater();
         View dialogLayout = inflater.inflate(R.layout.dialog_muon_xe, null);
         final TextView textViewSTTXe = dialogLayout.findViewById(R.id.tv_stt_xe);
@@ -300,10 +347,18 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
 
     private void addMarker(int sttXe, Double lat, Double lng) {
-        LatLng dhCanTho = new LatLng(lat, lng);
-        Marker markerNew = mMap.addMarker(new MarkerOptions().position(dhCanTho)
-                .title(sttXe + "").snippet("Xe số " + sttXe));
-        markerNew.showInfoWindow();
+        IconGenerator iconFactory = new IconGenerator(this);
+        iconFactory.setStyle(IconGenerator.STYLE_BLUE);
+        LatLng latLng = new LatLng(lat, lng);
+//        Bitmap bitmap = makeBitmap(this, sttXe + "");
+        Marker markerNew = mMap.addMarker(new MarkerOptions()
+                .position(latLng)
+                .title(sttXe + "")
+                .snippet("Xe số " + sttXe)
+                .icon(BitmapDescriptorFactory.fromBitmap(iconFactory.makeIcon(sttXe + "")))
+                .anchor(iconFactory.getAnchorU(), iconFactory.getAnchorV())
+        );
+//        markerNew.showInfoWindow();
 
     }
 
@@ -375,6 +430,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     }
 
     private void layDSXeDangRanh() {
+        Log.e(TAG, "layDSXeDangRanh: ");
         ConnectServer.getInstance().getApi().layDSXeDangRanh().enqueue(new Callback<List<XeDangRanh>>() {
             @Override
             public void onResponse(Call<List<XeDangRanh>> call, Response<List<XeDangRanh>> response) {
@@ -387,6 +443,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                     }
                 }
                 if (response.code() == 200 && response.body() != null) {
+                    mMap.clear();
                     List<XeDangRanh> dsXeDangRanh = new ArrayList<>(response.body());
                     for (XeDangRanh xedangranh : dsXeDangRanh) {
                         addMarker(xedangranh.getxEID(), xedangranh.getxELAT(), xedangranh.getxELNG());
@@ -513,15 +570,12 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         mMap.animateCamera(cameraUpdate, 2000, new GoogleMap.CancelableCallback() {
             @Override
             public void onFinish() {
-                viewDialogMuonXe(marker.getTitle(), latLng.latitude, latLng.longitude);
             }
 
             @Override
             public void onCancel() {
-
             }
         });
-
 
     }
 
@@ -541,6 +595,49 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                 });
         final AlertDialog alert = builder.create();
         alert.show();
+    }
+
+    @Override
+    protected void onStop() {
+        super.onStop();
+        Log.e(TAG, "onStop: ");
+//        mTimer.cancel();
+        isOnstart = false;
+    }
+
+
+    @Override
+    protected void onStart() {
+        super.onStart();
+        Log.e(TAG, "onStart: ");
+        isOnstart = true;
+    }
+
+    @Override
+    public boolean onMarkerClick(final Marker marker) {
+
+        final String title = marker.getTitle();
+        final LatLng latLng = marker.getPosition();
+        //Di chuyen camera den marker
+        CameraPosition cameraPosition = CameraPosition.builder()
+                .target(marker.getPosition())
+                .zoom(18)// ti le zoom
+                .build();
+
+        CameraUpdate cameraUpdate = CameraUpdateFactory.newCameraPosition(cameraPosition);
+        mMap.animateCamera(cameraUpdate, 2000, new GoogleMap.CancelableCallback() {
+            @Override
+            public void onFinish() {
+                viewDialogMuonXe(title, latLng.latitude, latLng.longitude);
+            }
+
+            @Override
+            public void onCancel() {
+
+            }
+        });
+
+        return true;
     }
 }
 
