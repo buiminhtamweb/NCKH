@@ -100,12 +100,14 @@ public class LichSuViPhamFrag extends Fragment implements RecyLSViPhamAdapter.on
                         e.printStackTrace();
                     }
                 }
-                if (response.code() == 200 && response.body().getTotal() == 0) {
+                if (response.code() == 200 && response.body() != null && response.body().getDocs().size() == 0) {
                     mTvViewErr.setVisibility(View.VISIBLE);
+                    mRecyclerView.setVisibility(View.GONE);
                 } else if (response.body() != null) {
 //                    for (Doc doc : response.body().getDocs() ) {
 
                     mTvViewErr.setVisibility(View.GONE);
+                    mRecyclerView.setVisibility(View.VISIBLE);
                     mViPhamObjectList.addAll(response.body().getDocs());
                     mPageMax = response.body().getPages();
                     mLsViPhamAdapter.notifyDataSetChanged();

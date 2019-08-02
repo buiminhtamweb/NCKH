@@ -113,11 +113,13 @@ public class LichSuMuonXeFrag extends Fragment implements RecyLSMuonXeAdapter.on
                         e.printStackTrace();
                     }
                 }
-                if (response.code() == 200 && response.body().getTotal() == 0) {
+                if (response.code() == 200 && response.body() != null && response.body().getDocs().size() == 0) {
                     mTvViewErr.setVisibility(View.VISIBLE);
+                    mRecyLichSuMuonXe.setVisibility(View.GONE);
                 } else {
 //                    for (Doc doc : response.body().getDocs() ) {
                     mTvViewErr.setVisibility(View.GONE);
+                    mRecyLichSuMuonXe.setVisibility(View.VISIBLE);
                     if (response.body() != null) {
                         mMuonXeObjectList.addAll(response.body().getDocs());
                         mPageMax = response.body().getPages();

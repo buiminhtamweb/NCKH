@@ -1,10 +1,14 @@
 package com.example.nckh.activity;
 
 import android.app.AlertDialog;
+import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.net.Uri;
+import android.os.Build;
 import android.os.Bundle;
+import android.os.VibrationEffect;
+import android.os.Vibrator;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -12,6 +16,7 @@ import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.EditText;
 import android.widget.ImageView;
+import android.widget.RelativeLayout;
 import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -21,6 +26,7 @@ import androidx.appcompat.app.AppCompatActivity;
 import com.example.nckh.R;
 import com.example.nckh.data.ConnectServer;
 import com.example.nckh.object.Message;
+import com.example.nckh.object.XE;
 import com.example.nckh.object.XeDangMuon;
 import com.example.nckh.util.DialogSupport;
 import com.example.nckh.util.SharedPreferencesHandler;
@@ -42,17 +48,22 @@ import static com.example.nckh.util.Constant.TOKEN;
 
 public class DangMuonXeActivity extends AppCompatActivity {
     private static final String TAG = "DAG_MUON_XE";
+    private static final int TIME_VIBRATE = 2000;
+
     private TextView mTvXeMuon;
     private AlertDialog mAlertDialog;
     private List<String> mDSLoi = new ArrayList<>();
     private String mToaDo;
     private String mToken;
     private String mTK_ID;
+    private String mXE_ID = "";
     private TextView mTvThoiGianMuon;
     private DialogSupport mDialogSupport;
     private ImageView mImgLichSuIcon;
     private Timer mTimer = new Timer();
     private boolean isOnstart = false;
+    private RelativeLayout mRelativeLayoutBG;
+    private TextView mTvCanhBao;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -65,6 +76,9 @@ public class DangMuonXeActivity extends AppCompatActivity {
         mTvXeMuon = (TextView) findViewById(R.id.tv_stt_xe_dang_muon);
         mTvThoiGianMuon = (TextView) findViewById(R.id.tv_thoi_gian_muon);
         mImgLichSuIcon = (ImageView) findViewById(R.id.img_lich_su_icon);
+        mRelativeLayoutBG = (RelativeLayout) findViewById(R.id.relative_backround);
+        mTvCanhBao = (TextView) findViewById(R.id.tv_canh_bao);
+
         mImgLichSuIcon.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -80,7 +94,8 @@ public class DangMuonXeActivity extends AppCompatActivity {
 
         Intent intent = getIntent();
         if (null != intent) {
-            mTvXeMuon.setText(intent.getStringExtra("STTXE"));
+            mXE_ID = intent.getStringExtra("STTXE");
+            mTvXeMuon.setText(mXE_ID);
             mToaDo = intent.getStringExtra("TOA_DO");
         }
 
@@ -112,6 +127,39 @@ public class DangMuonXeActivity extends AppCompatActivity {
     protected void onStart() {
         super.onStart();
         isOnstart = true;
+    }
+
+    private void kiemTraTrangThaiXe() {
+        if (mXE_ID.equals(""))
+            ConnectServer.getInstance().getApi().layThongTinXe(mTvXeMuon.getText().toString()).enqueue(new Callback<XE>() {
+                @Override
+                public void onResponse(Call<XE> call, Response<XE> response) {
+                    if (response.code() == 200 && response.body() != null) {
+                        if (response.body().getXeTrangThai() == 3) { // Xe dag vượt khỏi phạm vi
+                            mTvCanhBao.setVisibility(View.VISIBLE);
+                            mRelativeLayoutBG.setBackgroundColor(getResources().getColor(R.color.dark_red));
+                            Vibrator v = (Vibrator) getSystemService(Context.VIBRATOR_SERVICE);
+                            // Vibrate for 500 milliseconds
+                            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+                                v.vibrate(VibrationEffect.createOneShot(TIME_VIBRATE, VibrationEffect.DEFAULT_AMPLITUDE));
+                            } else {
+                                //deprecated in API 26
+                                v.vibrate(TIME_VIBRATE);
+                            }
+                        } else if (response.body().getXeTrangThai() == 1) { // Xe nằm trong trường
+                            mTvCanhBao.setVisibility(View.GONE);
+                            mRelativeLayoutBG.setBackgroundColor(getResources().getColor(R.color.design_default_color_primary_dark));
+                        }
+                    }
+
+
+                }
+
+                @Override
+                public void onFailure(Call<XE> call, Throwable t) {
+                    mDialogSupport.viewErrorExitApp();
+                }
+            });
     }
 
     private void getDataFromServer() {

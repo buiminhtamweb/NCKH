@@ -15,12 +15,10 @@ public class XE {
     @SerializedName("XE_LNG")
     @Expose
     private Double xELNG;
-    @SerializedName("XE_NAMSANXUAT")
+    @SerializedName("XE_TRANGTHAI")
     @Expose
-    private String xENAMSANXUAT;
-    @SerializedName("XE_GHICHU")
-    @Expose
-    private String xEGHICHU;
+    private Integer xeTrangThai;
+
 
     public Integer getXEID() {
         return xEID;
@@ -46,20 +44,13 @@ public class XE {
         this.xELNG = xELNG;
     }
 
-    public String getXENAMSANXUAT() {
-        return xENAMSANXUAT;
+
+    public Integer getXeTrangThai() {
+        return xeTrangThai;
     }
 
-    public void setXENAMSANXUAT(String xENAMSANXUAT) {
-        this.xENAMSANXUAT = xENAMSANXUAT;
-    }
-
-    public String getXEGHICHU() {
-        return xEGHICHU;
-    }
-
-    public void setXEGHICHU(String xEGHICHU) {
-        this.xEGHICHU = xEGHICHU;
+    public void setXeTrangThai(Integer xeTrangThai) {
+        this.xeTrangThai = xeTrangThai;
     }
 
 }
