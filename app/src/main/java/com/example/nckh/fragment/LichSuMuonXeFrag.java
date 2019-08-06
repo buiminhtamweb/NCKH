@@ -113,20 +113,19 @@ public class LichSuMuonXeFrag extends Fragment implements RecyLSMuonXeAdapter.on
                         e.printStackTrace();
                     }
                 }
-                if (response.code() == 200 && response.body() != null && response.body().getDocs().size() == 0) {
-                    mTvViewErr.setVisibility(View.VISIBLE);
-                    mRecyLichSuMuonXe.setVisibility(View.GONE);
-                } else {
-//                    for (Doc doc : response.body().getDocs() ) {
+                if (response.code() == 200 && response.body() != null) {
+
                     mTvViewErr.setVisibility(View.GONE);
                     mRecyLichSuMuonXe.setVisibility(View.VISIBLE);
                     if (response.body() != null) {
                         mMuonXeObjectList.addAll(response.body().getDocs());
                         mPageMax = response.body().getPages();
                         mMuonXeAdapter.notifyDataSetChanged();
+                        if (mMuonXeObjectList.size() == 0) { // Nếu k có thì hiện lỗi
+                            mTvViewErr.setVisibility(View.VISIBLE);
+                            mRecyLichSuMuonXe.setVisibility(View.GONE);
+                        }
                     }
-//                    }
-
                 }
 
             }

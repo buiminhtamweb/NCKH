@@ -26,9 +26,15 @@
     <string name="title_activity_main">MainActivity</string>
 
     <string-array name="danh_sach_hu_hong">
-        <item>Chọn hư hỏng...</item>
+        <item>Chọn hư hỏng…</item>
         <item>Không mở được ổ khóa</item>
-        <item>Không khóa được khóa xe</item>
+        <item>Không khóa được xe</item>
+        <item>Đã khóa xe nhưng không cập nhật trên điện thoại</item>
+        <item>Đứt dây sên</item>
+        <item>Bể bánh xe trước</item>
+        <item>Bể bánh xe sau</item>
+        <item>Thắng trước không ăn</item>
+        <item>Thắng sau không ăn</item>
         <item>Khác</item>
     </string-array>
 

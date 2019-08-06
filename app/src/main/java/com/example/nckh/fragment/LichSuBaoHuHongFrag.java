@@ -96,22 +96,19 @@ public class LichSuBaoHuHongFrag extends Fragment implements RecyLSBaoHuHongAdap
                         e.printStackTrace();
                     }
                 }
-                if (response.code() == 200 && response.body() != null && response.body().getDocs().size() == 0) {
-                    mTvViewErr.setVisibility(View.VISIBLE);
-                    mRecyclerView.setVisibility(View.GONE);
 
-                } else {
-//                    for (Doc doc : response.body().getDocs() ) {
-                    if (response.body() != null) {
-                        mTvViewErr.setVisibility(View.GONE);
-                        mRecyclerView.setVisibility(View.VISIBLE);
-                        mHuHongObjectList.addAll(response.body().getDocs());
-                        pageMax = response.body().getPages();
-                        mRecyLSBaoHuHongAdapter.notifyDataSetChanged();
+                if (response.code() == 200 && response.body() != null) {
+                    mTvViewErr.setVisibility(View.GONE);
+                    mRecyclerView.setVisibility(View.VISIBLE);
+                    mHuHongObjectList.addAll(response.body().getDocs());
+                    pageMax = response.body().getPages();
+                    mRecyLSBaoHuHongAdapter.notifyDataSetChanged();
+                    if (mHuHongObjectList.size() == 0) {
+                        mTvViewErr.setVisibility(View.VISIBLE);
+                        mRecyclerView.setVisibility(View.GONE);
                     }
-
-//                    }
                 }
+
 
             }
 

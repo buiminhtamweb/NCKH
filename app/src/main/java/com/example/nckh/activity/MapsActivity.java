@@ -355,7 +355,8 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                 .position(latLng)
                 .title(sttXe + "")
                 .snippet("Xe số " + sttXe)
-                .icon(BitmapDescriptorFactory.fromBitmap(iconFactory.makeIcon(sttXe + "")))
+//                .icon(BitmapDescriptorFactory.fromBitmap(iconFactory.makeIcon(sttXe + "")))
+                        .icon(BitmapDescriptorFactory.fromResource(R.drawable.xedap_blue_48))
                 .anchor(iconFactory.getAnchorU(), iconFactory.getAnchorV())
         );
 //        markerNew.showInfoWindow();
@@ -403,6 +404,8 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
     private void dangXuat() {
         SharedPreferencesHandler.wipeSharedPreferences(this);
+        startActivity(new Intent(this, LoginActivity.class));
+        finish();
     }
 
     private void muonXe(int idXe, double viTriMuonLat, double viTriMuonLng) {

@@ -56,7 +56,7 @@ public class DangMuonXeActivity extends AppCompatActivity {
     private String mToaDo;
     private String mToken;
     private String mTK_ID;
-    private String mXE_ID = "";
+    private static String mXE_ID = "";
     private TextView mTvThoiGianMuon;
     private DialogSupport mDialogSupport;
     private ImageView mImgLichSuIcon;
@@ -94,7 +94,9 @@ public class DangMuonXeActivity extends AppCompatActivity {
 
         Intent intent = getIntent();
         if (null != intent) {
-            mXE_ID = intent.getStringExtra("STTXE");
+            if (intent.getStringExtra("STTXE") != null)
+                mXE_ID = intent.getStringExtra("STTXE");
+            else mXE_ID = mTvXeMuon.getText().toString();
             mTvXeMuon.setText(mXE_ID);
             mToaDo = intent.getStringExtra("TOA_DO");
         }
@@ -109,8 +111,12 @@ public class DangMuonXeActivity extends AppCompatActivity {
                                            runOnUiThread(new Runnable() {
                                                @Override
                                                public void run() {
+                                                   Log.e(TAG, "run: kiemTraTrangThaiXe->" + mXE_ID);
+                                                   kiemTraTrangThaiXe();
                                                    if (isOnstart)
-                                                       getDataFromServer();
+                                                       Log.e(TAG, "run: getDataFromServer");
+
+                                                   getDataFromServer();
                                                }
                                            });
                                        }
@@ -130,11 +136,13 @@ public class DangMuonXeActivity extends AppCompatActivity {
     }
 
     private void kiemTraTrangThaiXe() {
-        if (mXE_ID.equals(""))
+
+        if (mXE_ID != null && !mXE_ID.equals(""))
             ConnectServer.getInstance().getApi().layThongTinXe(mTvXeMuon.getText().toString()).enqueue(new Callback<XE>() {
                 @Override
                 public void onResponse(Call<XE> call, Response<XE> response) {
                     if (response.code() == 200 && response.body() != null) {
+                        Log.e(TAG, "onResponse: checkTT: " + response.body().getXeTrangThai());
                         if (response.body().getXeTrangThai() == 3) { // Xe dag vượt khỏi phạm vi
                             mTvCanhBao.setVisibility(View.VISIBLE);
                             mRelativeLayoutBG.setBackgroundColor(getResources().getColor(R.color.dark_red));
@@ -325,9 +333,11 @@ public class DangMuonXeActivity extends AppCompatActivity {
     @Override
     protected void onDestroy() {
         super.onDestroy();
-        if (mTimer != null) {
-            mTimer.cancel();
-        }
+    }
 
+    @Override
+    public void onBackPressed() {
+        super.onBackPressed();
+        minimizeApp();
     }
 }
