@@ -111,6 +111,10 @@ public class LichSuViPhamFrag extends Fragment implements RecyLSViPhamAdapter.on
                     if (mViPhamObjectList.size() == 0) { // Nếu k có thì hiện lỗi
                         mTvViewErr.setVisibility(View.VISIBLE);
                         mRecyclerView.setVisibility(View.GONE);
+                    } else {
+//                        for (Doc doc :mViPhamObjectList ) {
+//                            Log.e("LS_VP", "onResponse: "+doc.getVPID() );
+//                        }
                     }
                 }
 

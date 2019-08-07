@@ -37,7 +37,7 @@ public class RecyLSViPhamAdapter extends RecyclerView.Adapter<RecyLSViPhamAdapte
     public void onBindViewHolder(@NonNull Holder holder, int position) {
         holder.sttXe.setText("Xe số " + mViPhamObjectList.get(position).getMuontra().getXEID() + "");
         holder.thoiGianViPham.setText("Vi phạm vào lúc: " + mViPhamObjectList.get(position).getVPTHOIGIAN());
-        holder.viTriViPham.setText("Vị trí: " + mViPhamObjectList.get(position).getVPLAT() + "-" + mViPhamObjectList.get(position).getVPLNG());
+        holder.viTriViPham.setText(mViPhamObjectList.get(position).getVPLAT() + "-" + mViPhamObjectList.get(position).getVPLNG());
         holder.loiViPham.setText("Lỗi: " + mViPhamObjectList.get(position).getLoi().getLOITEN());
         holder.hinhThucXuLy.setText(mViPhamObjectList.get(position).getLoi().getLOIMOTA());
         onScrollListener.onScroll(position);
@@ -45,7 +45,7 @@ public class RecyLSViPhamAdapter extends RecyclerView.Adapter<RecyLSViPhamAdapte
 
     @Override
     public int getItemCount() {
-        return 0;
+        return mViPhamObjectList.size();
     }
 
     public class Holder extends RecyclerView.ViewHolder {

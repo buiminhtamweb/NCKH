@@ -21,17 +21,42 @@
         android:layout_height="wrap_content"
         android:text="Vi phạm vào lúc: 19/7/2019" />
 
-    <TextView
-        android:id="@+id/tv_item_vi_tri_vi_pham"
-        android:layout_width="match_parent"
+    <LinearLayout
+        android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Tại vị trí: 11.1000000;105.02392343" />
+        android:orientation="horizontal">
 
-    <TextView
-        android:id="@+id/tv_item_loi_vi_pham"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:text="Vượt ra khỏi khuôn viên trường đại học" />
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Tại vị trí: " />
+
+        <TextView
+            android:textColor="@color/blue"
+            android:id="@+id/tv_item_vi_tri_vi_pham"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="11.1000000;105.02392343" />
+    </LinearLayout>
+
+
+    <LinearLayout
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content">
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+
+            android:text="Lỗi: " />
+
+        <TextView
+            android:id="@+id/tv_item_loi_vi_pham"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Vượt ra khỏi khuôn viên trường đại học" />
+    </LinearLayout>
+
 
     <TextView
         android:id="@+id/tv_item_hinh_thuc_xu_ly"
