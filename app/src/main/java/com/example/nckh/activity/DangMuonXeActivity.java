@@ -1,9 +1,13 @@
 package com.example.nckh.activity;
 
 import android.app.AlertDialog;
+import android.app.Notification;
+import android.app.NotificationManager;
+import android.app.PendingIntent;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.graphics.Color;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
@@ -56,14 +60,19 @@ public class DangMuonXeActivity extends AppCompatActivity {
     private String mToaDo;
     private String mToken;
     private String mTK_ID;
-    private static String mXE_ID = "";
+    private String mXE_ID = "";
     private TextView mTvThoiGianMuon;
     private DialogSupport mDialogSupport;
     private ImageView mImgLichSuIcon;
     private Timer mTimer = new Timer();
+    private TimerTask mTimerTask;
     private boolean isOnstart = false;
+    private boolean isShowNotifi = false;
+
     private RelativeLayout mRelativeLayoutBG;
     private TextView mTvCanhBao;
+    private NotificationManager mNotificationManager;
+    private Notification mNotification;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -92,7 +101,7 @@ public class DangMuonXeActivity extends AppCompatActivity {
 
         mDialogSupport = new DialogSupport(this, mAlertDialog, null);
 
-        Intent intent = getIntent();
+        Intent intent = getIntent(); //Lấy dữ liệu Intent
         if (null != intent) {
             if (intent.getStringExtra("STTXE") != null)
                 mXE_ID = intent.getStringExtra("STTXE");
@@ -104,27 +113,51 @@ public class DangMuonXeActivity extends AppCompatActivity {
         //Khoi tạo danh sach loi
         mDSLoi.addAll(Arrays.asList(getResources().getStringArray(R.array.danh_sach_hu_hong)));
 
-        mTimer.scheduleAtFixedRate(new TimerTask() {
-                                       @Override
-                                       public void run() {
-                                           //Called each time when 1000 milliseconds (1 second) (the period parameter)
-                                           runOnUiThread(new Runnable() {
-                                               @Override
-                                               public void run() {
-                                                   Log.e(TAG, "run: kiemTraTrangThaiXe->" + mXE_ID);
-                                                   kiemTraTrangThaiXe();
-                                                   if (isOnstart)
-                                                       Log.e(TAG, "run: getDataFromServer");
+        //hẹn giờ lấy và kiểm tra liên tục dữ liệu
+        mTimerTask = new TimerTask() {
+            @Override
+            public void run() {
+                //Called each time when 1000 milliseconds (1 second) (the period parameter)
+                runOnUiThread(new Runnable() {
+                    @Override
+                    public void run() {
+                        Log.e(TAG, "run: kiemTraTrangThaiXe->" + mXE_ID);
+                        kiemTraTrangThaiXe();
+                        if (isOnstart)
+                            Log.e(TAG, "run: getDataFromServer");
 
-                                                   getDataFromServer();
-                                               }
-                                           });
-                                       }
-                                   },
+                        getDataFromServer();
+                    }
+                });
+            }
+        };
+
+        mTimer.scheduleAtFixedRate(mTimerTask,
                 //Set how long before to start calling the TimerTask (in milliseconds)
                 0,
                 //Set the amount of time between each execution (in milliseconds)
                 3000);
+
+        Intent intentApplication = new Intent(this, DangMuonXeActivity.class);
+// use System.currentTimeMillis() to have a unique ID for the pending intent
+        PendingIntent pIntent = PendingIntent.getActivity(this, (int) System.currentTimeMillis(), intentApplication, 0);
+
+// build notification
+// the addAction re-use the same intent to keep the example short
+        mNotification = new Notification.Builder(this)
+                .setContentTitle("Cảnh báo mượn xe")
+                .setContentText("Bạn đang vượt khỏi khuôn viên trường ĐH Cần Thơ")
+                .setSmallIcon(R.drawable.logo_ctu)
+                .setContentIntent(pIntent)
+                .setAutoCancel(false)
+                .setColor(Color.RED)
+                .addAction(R.drawable.logo_ctu, "Mở ứng dụng", pIntent).build();
+
+        mNotificationManager =
+                (NotificationManager) getSystemService(NOTIFICATION_SERVICE);
+
+//        n.visibility;
+
 
 
     }
@@ -134,6 +167,7 @@ public class DangMuonXeActivity extends AppCompatActivity {
         super.onStart();
         isOnstart = true;
     }
+
 
     private void kiemTraTrangThaiXe() {
 
@@ -154,9 +188,18 @@ public class DangMuonXeActivity extends AppCompatActivity {
                                 //deprecated in API 26
                                 v.vibrate(TIME_VIBRATE);
                             }
+                            if (!isShowNotifi) {
+                                mNotificationManager.notify(0, mNotification);
+                            }
+
                         } else if (response.body().getXeTrangThai() == 1) { // Xe nằm trong trường
                             mTvCanhBao.setVisibility(View.GONE);
                             mRelativeLayoutBG.setBackgroundColor(getResources().getColor(R.color.design_default_color_primary_dark));
+//                            if(isShowNotifi) {
+                            mNotificationManager.cancel(0);
+                            mNotificationManager.cancelAll();
+                            isShowNotifi = false;
+//                            }
                         }
                     }
 
@@ -196,6 +239,7 @@ public class DangMuonXeActivity extends AppCompatActivity {
                         mTvThoiGianMuon.setText(response.body().getmUONTHOIGIAN());
                     } else {
                         startActivity(new Intent(DangMuonXeActivity.this, MapsActivity.class));
+                        finish();
                     }
 
                 }
@@ -333,6 +377,9 @@ public class DangMuonXeActivity extends AppCompatActivity {
     @Override
     protected void onDestroy() {
         super.onDestroy();
+        mTimer.purge();
+        mTimerTask.cancel();
+//        mTimerTask.
     }
 
     @Override

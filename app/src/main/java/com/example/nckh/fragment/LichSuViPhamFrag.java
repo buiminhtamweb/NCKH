@@ -5,6 +5,7 @@ import android.app.ProgressDialog;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -106,6 +107,7 @@ public class LichSuViPhamFrag extends Fragment implements RecyLSViPhamAdapter.on
                     mViPhamObjectList.addAll(response.body().getDocs());
                     mPageMax = response.body().getPages();
                     mLsViPhamAdapter.notifyDataSetChanged();
+                    Log.e("LS_VP", "onResponse: mViPhamObjectList.size->" + mViPhamObjectList.size());
                     if (mViPhamObjectList.size() == 0) { // Nếu k có thì hiện lỗi
                         mTvViewErr.setVisibility(View.VISIBLE);
                         mRecyclerView.setVisibility(View.GONE);

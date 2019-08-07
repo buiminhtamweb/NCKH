@@ -140,6 +140,7 @@ public class LoginActivity extends AppCompatActivity {
                         Intent i = new Intent(LoginActivity.this, DangMuonXeActivity.class);
 //                        i.putExtra("data", (Serializable) response.body());
                         startActivity(i);
+                        finish();
                     }
 
 

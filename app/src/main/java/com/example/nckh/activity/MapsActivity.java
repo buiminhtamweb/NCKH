@@ -606,6 +606,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         Log.e(TAG, "onStop: ");
 //        mTimer.cancel();
         isOnstart = false;
+
     }
 
 
