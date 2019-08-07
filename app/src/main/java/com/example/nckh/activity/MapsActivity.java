@@ -20,6 +20,7 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
+import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 import android.widget.Toolbar;
@@ -83,15 +84,19 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     private Timer mTimer = new Timer();
     private boolean isMapReady = false;
     private boolean isOnstart = false;
+    private boolean isSatellite;
+    private ImageView mImgChangeTypeMap;
+    private List<XeDangRanh> mDsXeDangRanh = new ArrayList<>();
+    private TextView mBtnChangeTypeMap;
 
-    android.os.Handler customHandler;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_maps);
 
-
+        isSatellite = SharedPreferencesHandler.getBoolean(MapsActivity.this, "isSatellite");
+        Log.e(TAG, "onCreate: isSatellite:" + SharedPreferencesHandler.getBoolean(this, "isSatellite"));
         mToken = SharedPreferencesHandler.getString(this, TOKEN);
         mTK_ID = SharedPreferencesHandler.getString(this, TK_ID);
         //Toolbar
@@ -105,6 +110,31 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         mActionBar.setLogo(R.mipmap.ic_logo);
         ((TextView) toolbar.getChildAt(0)).setTextSize(15);
 
+        mImgChangeTypeMap = (ImageView) findViewById(R.id.img_change_type_maps);
+        mBtnChangeTypeMap = (TextView) findViewById(R.id.tv_change_type_maps);
+
+        mImgChangeTypeMap.setImageResource(R.drawable.ve_tinh);
+
+        mImgChangeTypeMap.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if (isMapReady) {
+                    if (isSatellite) { // dag là vệ tinh
+                        mImgChangeTypeMap.setImageResource(R.drawable.giao_thong);
+                        mMap.setMapType(GoogleMap.MAP_TYPE_NORMAL);
+                        mBtnChangeTypeMap.setText("Giao thông");
+                        SharedPreferencesHandler.writeBoolean(MapsActivity.this, "isSatellite", false);
+                        isSatellite = false;
+                    } else { //Dang là giao thông
+                        mImgChangeTypeMap.setImageResource(R.drawable.ve_tinh);
+                        mMap.setMapType(GoogleMap.MAP_TYPE_HYBRID);
+                        mBtnChangeTypeMap.setText("Vệ tinh");
+                        SharedPreferencesHandler.writeBoolean(MapsActivity.this, "isSatellite", true);
+                        isSatellite = true;
+                    }
+                }
+            }
+        });
 
         mDialogSupport = new DialogSupport(this, mAlertDialog, null);
         // Obtain the SupportMapFragment and get notified when the map is ready to be used.
@@ -177,6 +207,11 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         mMap.getUiSettings().setZoomControlsEnabled(true);
         mMap.getUiSettings().setIndoorLevelPickerEnabled(true);
         mMap.getUiSettings().setMapToolbarEnabled(true);
+        if (isSatellite) {
+            mImgChangeTypeMap.setImageResource(R.drawable.giao_thong);
+            mMap.setMapType(GoogleMap.MAP_TYPE_HYBRID);
+            mBtnChangeTypeMap.setText("Giao thông");
+        }
 
         //Zoom maps đến CTU
         LatLng dhCanTho = new LatLng(10.030718, 105.7680055);
@@ -349,17 +384,30 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     private void addMarker(int sttXe, Double lat, Double lng) {
         IconGenerator iconFactory = new IconGenerator(this);
         iconFactory.setStyle(IconGenerator.STYLE_BLUE);
-        LatLng latLng = new LatLng(lat, lng);
+        if (lat != null && lng != null) {
+            try {
+                LatLng latLng = new LatLng(lat, lng);
 //        Bitmap bitmap = makeBitmap(this, sttXe + "");
-        Marker markerNew = mMap.addMarker(new MarkerOptions()
-                .position(latLng)
-                .title(sttXe + "")
-                .snippet("Xe số " + sttXe)
-//                .icon(BitmapDescriptorFactory.fromBitmap(iconFactory.makeIcon(sttXe + "")))
-                        .icon(BitmapDescriptorFactory.fromResource(R.drawable.xedap_blue_48))
-                .anchor(iconFactory.getAnchorU(), iconFactory.getAnchorV())
-        );
+                MarkerOptions markerOptions = new MarkerOptions()
+                        .position(latLng)
+                        .title(sttXe + "")
+                        .snippet("Xe số " + sttXe)
+                        .anchor(iconFactory.getAnchorU(), iconFactory.getAnchorV());
+
+                if (isSatellite)
+                    markerOptions.icon(BitmapDescriptorFactory.fromResource(R.drawable.xedap_blue_48_out_1));
+                else
+                    markerOptions.icon(BitmapDescriptorFactory.fromResource(R.drawable.xedap_blue_48));
+
+                Marker markerNew = mMap.addMarker(markerOptions);
 //        markerNew.showInfoWindow();
+            } catch (Exception ignored) {
+                Log.e(TAG, "addMarker: \n ---------------------------------------------------------------" +
+                        "----------------------------------------- \n " + ignored.getMessage());
+            }
+
+        }
+
 
     }
 
@@ -447,9 +495,11 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                 }
                 if (response.code() == 200 && response.body() != null) {
                     mMap.clear();
-                    List<XeDangRanh> dsXeDangRanh = new ArrayList<>(response.body());
-                    for (XeDangRanh xedangranh : dsXeDangRanh) {
-                        addMarker(xedangranh.getxEID(), xedangranh.getxELAT(), xedangranh.getxELNG());
+                    mDsXeDangRanh.clear();
+                    mDsXeDangRanh.addAll(response.body());
+                    for (XeDangRanh xedangranh : mDsXeDangRanh) {
+                        if (xedangranh.getxELAT() != null && xedangranh.getxELNG() != null)
+                            addMarker(xedangranh.getxEID(), xedangranh.getxELAT(), xedangranh.getxELNG());
                     }
                 }
 

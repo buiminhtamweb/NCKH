@@ -57,11 +57,11 @@ public class LoginActivity extends AppCompatActivity {
     }
 
     public void login(final View v) {
-        mDialogSupport.viewProgressDialog("Đang đăng nhập ... ");
+
 //        Intent i = new Intent(mContext, MapsActivity.class);
 //        startActivity(i);
         if (checkNullDangNhap()) {
-
+            mDialogSupport.viewProgressDialog("Đang đăng nhập ... ");
             Call<Token> call = ConnectServer.getInstance().getApi().signInAcc(mEdtUserName.getText().toString(),
                     mEdtPassword.getText().toString());
 
